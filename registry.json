@@ -1,0 +1,56 @@
+{
+  "home": {
+    "id": "home",
+    "label": "Home",
+    "type": "page",
+    "layout": "default",
+    "auth": false,
+    "enabled": true,
+    "nav": true,
+    "features": []
+  },
+
+  "blog": {
+    "id": "blog",
+    "label": "Blog",
+    "type": "page",
+    "layout": "default",
+    "auth": false,
+    "enabled": true,
+    "nav": true,
+    "features": []
+  },
+
+  "forums": {
+    "id": "forums",
+    "label": "Forums",
+    "type": "page",
+    "layout": "default",
+    "auth": false,
+    "enabled": true,
+    "nav": true,
+    "features": []
+  },
+
+  "calendar": {
+    "id": "calendar",
+    "label": "Calendar",
+    "type": "page",
+    "layout": "default",
+    "auth": false,
+    "enabled": true,
+    "nav": true,
+    "features": []
+  },
+
+  "account": {
+    "id": "account",
+    "label": "Account",
+    "type": "page",
+    "layout": "default",
+    "auth": false,
+    "enabled": true,
+    "nav": true,
+    "features": []
+  }
+}

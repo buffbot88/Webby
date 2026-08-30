@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+     <title>WebbyOS</title>
+
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%230f172a'/%3E%3Cpath d='M4 5.5h8L10.5 11h-5L4 5.5z' fill='%2338bdf8'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="./assets/theme.css">
+</head>
+
+<body>
+
+  <!-- =========================
+       APP ROOT
+  ========================== -->
+  <div id="app"></div>
+
+  <!-- =========================
+       OVERLAY + MODAL ROOTS
+  ========================== -->
+  <div id="overlayLayer"></div>
+  <div id="modalLayer"></div>
+
+  <!-- =========================
+       CORE ENGINE LAYER (ORDER MATTERS)
+  ========================== -->
+
+  <script src="./Core/Diagnostics/index.js"></script>
+  <script src="./assets/lifecycle.js"></script>
+  <script src="./assets/registryEngine.js"></script>
+  <script src="./assets/configLoader.js"></script>
+
+  <script src="./assets/featureEngine.js"></script>
+  <script src="./assets/pluginEngine.js"></script>
+
+  <script src="./assets/layoutEngine.js"></script>
+  <script src="./assets/moduleLoader.js"></script>
+
+  <script src="./Core/DataCore/index.js"></script>
+  <script src="./Core/Packages/index.js"></script>
+  <script src="./Core/Users/index.js"></script>
+  <script src="./Core/Content/index.js"></script>
+  <script src="./assets/notificationCoreSystem.js"></script>
+  <script src="./assets/reactionCoreSystem.js"></script>
+  <script src="./assets/bookmarkCoreSystem.js"></script>
+  <script src="./assets/activityFeedCoreSystem.js"></script>
+  <script src="./assets/messagingCoreSystem.js"></script>
+  <script src="./assets/moderationCoreSystem.js"></script>
+  <script src="./assets/reputationCoreSystem.js"></script>
+  <script src="./assets/mediaCoreSystem.js"></script>
+  <script src="./assets/categoryCoreSystem.js"></script>
+  <script src="./assets/tagCoreSystem.js"></script>
+  <script src="./assets/revisionCoreSystem.js"></script>
+  <script src="./assets/searchCoreSystem.js"></script>
+  <script src="./Core/Builders/widgets.js"></script>
+  <script src="./Core/Builders/navigation.js"></script>
+  <script src="./Core/Builders/homepage.js"></script>
+  <script src="./Core/AdminCore/index.js"></script>
+  <script src="./Core/Diagnostics/inspector.js"></script>
+
+  <script src="./Core/Runtime/index.js"></script>
+
+<!-- =========================
+     MODULE SDK
+========================== -->
+<script src="./assets/moduleSdk.js"></script>
+
+<!-- =========================
+     MODULES (PAGES)
+========================== -->
+<script src="./Core/Modules/Home/index.js"></script>
+<script src="./Core/Modules/Blog/index.js"></script>
+<script src="./Core/Modules/Forums/index.js"></script>
+<script src="./Core/Modules/Calendar/index.js"></script>
+<script src="./Core/Modules/Account/index.js"></script>
+
+  <!-- =========================
+       BOOT
+  ========================== -->
+  <script>
+    window.addEventListener("DOMContentLoaded", async () => {
+      await Runtime.init();
+    });
+  </script>
+
+</body>
+</html>
