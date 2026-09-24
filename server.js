@@ -19,15 +19,23 @@
  *   stores written by older PHP installs are still readable on disk.
  *
  * Configuration:
- * - WEBBYOS_STORAGE_SECRET overrides the storage secret. It must match the
- *   secret used by api/data.php for existing stores to decrypt. When unset,
- *   the server generates and persists a random secret (database/.storage-secret)
- *   for fresh installs, and refuses to boot in production without an explicit
- *   secret. Committed stores encrypted with the historical public default are
- *   therefore unreadable to any new deployment.
- * - WEBBYOS_DATA_DIR / WEBBYOS_UPLOADS_DIR relocate the encrypted stores and
- *   the upload directory (useful when data must live outside the app root).
- * - PORT / HOST control the listen address (defaults 8080 / 0.0.0.0).
+ * - server.config.json is the primary configuration file. Recognized keys:
+ *   `port`, `host`, `storageSecret`, `dataDir`, `uploadsDir`, `nodeEnv`.
+ *   Empty string / missing values fall through to the documented defaults.
+ * - Environment variables override the config file when both are set
+ *   (WEBBYOS_STORAGE_SECRET, WEBBYOS_DATA_DIR, WEBBYOS_UPLOADS_DIR, PORT,
+ *   HOST, NODE_ENV), so hosted platforms that inject values keep working.
+ * - WEBBYOS_STORAGE_SECRET (or `storageSecret`) must match the secret used
+ *   by api/data.php for existing stores to decrypt. When unset, the server
+ *   generates and persists a random secret (database/.storage-secret) for
+ *   fresh installs, and refuses to boot in production without an explicit
+ *   secret. Committed stores encrypted with the historical public default
+ *   are therefore unreadable to any new deployment.
+ * - WEBBYOS_DATA_DIR / WEBBYOS_UPLOADS_DIR (or `dataDir` / `uploadsDir`)
+ *   relocate the encrypted stores and the upload directory (useful when
+ *   data must live outside the app root).
+ * - PORT / HOST (or `port` / `host`) control the listen address (defaults
+ *   8080 / 0.0.0.0).
  */
 
 "use strict";
@@ -41,17 +49,69 @@ const { Readable } = require("node:stream");
 
 const ROOT = __dirname;
 
-const LEGACY_PUBLIC_SECRET = "CHANGE_THIS_SECRET_BEFORE_PRODUCTION";
+// ---------------------------------------------------------------------------
+// Configuration: server.config.json with environment-variable overrides.
+// Precedence per key: process.env > server.config.json > built-in default.
+// ---------------------------------------------------------------------------
+const CONFIG_FILE = path.join(ROOT, "server.config.json");
 
-// Resolved lazily so deployments (and tests) can relocate storage via env.
-function databaseDir() {
-  const override = process.env.WEBBYOS_DATA_DIR;
+function readConfigFile() {
+  try {
+    const parsed = JSON.parse(fs.readFileSync(CONFIG_FILE, "utf8"));
+    return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : {};
+  } catch (error) {
+    if (error && error.code !== "ENOENT") {
+      // A malformed config file should be loud, never silently ignored.
+      console.error(`[webbyos] WARNING: ${path.basename(CONFIG_FILE)} is not valid JSON (${error.message}); using defaults.`);
+    }
+    return {};
+  }
+}
+
+const FILE_CONFIG = readConfigFile();
+
+function configValue(envName, fileKey) {
+  const fromEnv = process.env[envName];
+  if (fromEnv !== undefined && fromEnv !== "") return fromEnv;
+  const fromFile = FILE_CONFIG[fileKey];
+  if (fromFile !== undefined && fromFile !== null && fromFile !== "") return String(fromFile);
+  return "";
+}
+
+function configPort() {
+  const raw = configValue("PORT", "port");
+  const parsed = Number(raw);
+  return Number.isInteger(parsed) && parsed > 0 && parsed < 65536 ? parsed : 8080;
+}
+
+function configHost() {
+  return configValue("HOST", "host") || "0.0.0.0";
+}
+
+function configDataDir() {
+  const override = configValue("WEBBYOS_DATA_DIR", "dataDir");
   return override ? path.resolve(override) : path.join(ROOT, "database");
 }
 
-function uploadsDir() {
-  const override = process.env.WEBBYOS_UPLOADS_DIR;
+function configUploadsDir() {
+  const override = configValue("WEBBYOS_UPLOADS_DIR", "uploadsDir");
   return override ? path.resolve(override) : path.join(ROOT, "uploads");
+}
+
+function configNodeEnv() {
+  return configValue("NODE_ENV", "nodeEnv") || "development";
+}
+
+const LEGACY_PUBLIC_SECRET = "CHANGE_THIS_SECRET_BEFORE_PRODUCTION";
+
+// Resolved lazily so deployments (and tests) can relocate storage via env
+// or the config file.
+function databaseDir() {
+  return configDataDir();
+}
+
+function uploadsDir() {
+  return configUploadsDir();
 }
 
 // The historical hardcoded secret is public knowledge (it ships in the repo),
@@ -66,10 +126,10 @@ function uploadsDir() {
 // an explicit secret, because a generated one cannot survive redeploys on
 // ephemeral filesystems.
 function resolveStorageSecret() {
-  const fromEnv = process.env.WEBBYOS_STORAGE_SECRET;
+  const fromEnv = configValue("WEBBYOS_STORAGE_SECRET", "storageSecret");
   if (fromEnv) return fromEnv;
 
-  const isProduction = process.env.NODE_ENV === "production";
+  const isProduction = configNodeEnv() === "production";
   const secretFile = path.join(databaseDir(), ".storage-secret");
 
   try {
@@ -81,8 +141,9 @@ function resolveStorageSecret() {
 
   if (isProduction) {
     throw new Error(
-      "Refusing to start in production without WEBBYOS_STORAGE_SECRET. " +
-        "The built-in default is public and must not protect real data."
+      "Refusing to start in production without WEBBYOS_STORAGE_SECRET " +
+        "(or server.config.json storageSecret). The built-in default is " +
+        "public and must not protect real data."
     );
   }
 
@@ -98,7 +159,8 @@ function resolveStorageSecret() {
     console.error(
       "[webbyos] WARNING: rotating the storage secret. Existing stores were " +
         "encrypted with the public default and will be treated as empty; the " +
-        "app re-seeds itself. Set WEBBYOS_STORAGE_SECRET to read them instead."
+        "app re-seeds itself. Set WEBBYOS_STORAGE_SECRET or server.config.json " +
+        "storageSecret to read them instead."
     );
   }
 
@@ -1061,8 +1123,8 @@ function createServer() {
 }
 
 function start() {
-  const port = Number(process.env.PORT) || 8080;
-  const host = process.env.HOST || "0.0.0.0";
+  const port = configPort();
+  const host = configHost();
   const server = createServer();
   server.listen(port, host, () => {
     process.stdout.write(`WebbyOS runtime listening on http://${host}:${port}\n`);
