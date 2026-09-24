@@ -170,6 +170,8 @@ const ALLOWED_IMAGE_TYPES = {
   "image/gif": "gif"
 };
 const MAX_JSON_BODY_BYTES = 8 * 1024 * 1024;
+// The 5 MB file limit plus multipart overhead (headers, action fields).
+const MAX_UPLOAD_BODY_BYTES = MAX_UPLOAD_BYTES + 64 * 1024;
 
 const MIME_TYPES = {
   ".html": "text/html; charset=utf-8",
@@ -829,6 +831,37 @@ function timestampStamp() {
   );
 }
 
+// Cap the raw upload request body BEFORE formData() parses it. Undici's
+// formData() consumes the entire stream before any field is validated, so
+// without a byte cap an attacker can stream unbounded data. Two layers:
+//   1. Reject an oversized declared Content-Length before reading anything
+//      (the connection stays healthy and the client gets a clean 413).
+//   2. A counting transform in the stream aborts when an undeclared or
+//      understated body exceeds the limit mid-flight.
+function uploadBodyTooLarge(res) {
+  return sendJson(res, 413, { error: "Upload is too large." });
+}
+
+function enforceUploadBodyCap(req, res) {
+  const declared = Number(req.headers["content-length"]);
+  if (Number.isFinite(declared) && declared > MAX_UPLOAD_BODY_BYTES) {
+    req.resume();
+    uploadBodyTooLarge(res);
+    return false;
+  }
+
+  let seen = 0;
+  req.on("data", (chunk) => {
+    seen += chunk.length;
+    if (seen > MAX_UPLOAD_BODY_BYTES) {
+      // A response is not reliably deliverable mid-multipart, so close the
+      // connection rather than continue buffering the rest of the body.
+      req.destroy();
+    }
+  });
+  return true;
+}
+
 async function handleUploadApi(req, res) {
   if (req.method !== "POST") {
     return sendJson(res, 405, { error: "Only POST requests are allowed." });
@@ -838,6 +871,8 @@ async function handleUploadApi(req, res) {
   if (!contentType.toLowerCase().startsWith("multipart/form-data")) {
     return sendJson(res, 400, { error: "Uploads must use multipart/form-data." });
   }
+
+  if (!enforceUploadBodyCap(req, res)) return;
 
   let form;
   try {
@@ -849,7 +884,10 @@ async function handleUploadApi(req, res) {
     });
     form = await request.formData();
   } catch {
-    return sendJson(res, 400, { error: "Invalid upload payload." });
+    // Covers both malformed payloads and the destroyed-socket case from the
+    // byte counter above (the client is gone, so a response attempt is a no-op).
+    if (!res.writableEnded) return sendJson(res, 400, { error: "Invalid upload payload." });
+    return;
   }
 
   const action = String(form.get("action") || "upload");
@@ -1046,5 +1084,7 @@ module.exports = {
   detectImageMime,
   STORE_FILES,
   databaseDir,
-  uploadsDir
+  uploadsDir,
+  MAX_UPLOAD_BYTES,
+  MAX_UPLOAD_BODY_BYTES
 };

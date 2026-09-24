@@ -1,4 +1,4 @@
-# WebbyOS
+﻿# WebbyOS
 
 WebbyOS is a modular self-hosted community ecosystem platform built with vanilla JavaScript and lightweight PHP persistence services.
 
@@ -300,14 +300,26 @@ Configuration:
 
 - `WEBBYOS_STORAGE_SECRET` sets the storage secret explicitly. When unset, the
   server generates and persists a random secret to `database/.storage-secret`
-  (git-ignored) for fresh installs; existing local stores keep working with the
-  historical default and a loud warning. In production (`NODE_ENV=production`)
-  the server refuses to boot without an explicit secret. Stores committed to
-  the repository were encrypted with the historical public default and are
-  therefore intentionally unreadable to any deployment using a rotated or
-  generated secret - the app re-seeds itself in that case.
+  (git-ignored); stores committed to the repository were encrypted with the
+  historical public default and are therefore intentionally unreadable to any
+  deployment using a rotated or generated secret - the app re-seeds itself in
+  that case. In production (`NODE_ENV=production`) the server refuses to boot
+  without an explicit secret.
 - `WEBBYOS_DATA_DIR` and `WEBBYOS_UPLOADS_DIR` relocate the encrypted stores and
   upload directory when data must live outside the app root.
+- Upload request bodies are capped at `MAX_UPLOAD_BYTES + 64 KB` of multipart
+  overhead: an oversized declared `Content-Length` gets a clean `413` and an
+  undeclared oversized stream is cut off mid-flight, so `formData()` parsing
+  can never buffer unbounded input.
+- Package reconciliation and search-index rebuilds are no-ops on disk when
+  nothing changed, so repeated app boots no longer rewrite
+  `database/packages.enc` or `database/searchIndex.enc`.
+
+Scripts (`package.json`):
+
+- `npm run dev` / `npm start` - run the server (`PORT`, `HOST` env respected).
+- `npm run check` - syntax-check `server.js`.
+- `npm test` - the node:test suite in `test/` (no dependencies).
 
 > The `database/` folder remains a development placeholder. Set a real
 > `WEBBYOS_STORAGE_SECRET` before any production deployment, and change the

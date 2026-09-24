@@ -4,6 +4,14 @@
 # would ship a live "signed in" session to every fresh clone or deploy.
 database/sessions.enc
 
+# Runtime stores rewritten by the app on boot or content changes. Content lives
+# in the deployment's data directory; committing them would ship live records
+# and make every run dirty the working tree. Seeds regenerate their contents.
+database/moduleData.enc
+database/searchIndex.enc
+database/packages.enc
+database/users.enc
+
 # Uploaded media written by the media system at runtime.
 uploads/
 

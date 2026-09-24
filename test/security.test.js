@@ -271,6 +271,29 @@ test("put/update reject empty payloads exactly like api/data.php", async (t) => 
   assert.strictEqual(ok.status, 200);
 });
 
+test("upload request body is capped before parsing", async (t) => {
+  const server = rt.createServer();
+  const port = await listen(server);
+  t.after(() => server.close());
+
+  // Declared oversized body: clean 413, connection stays usable.
+  const big = Buffer.alloc(rt.MAX_UPLOAD_BYTES + 128 * 1024, 0x41);
+  const form = multipart({}, "media", big, "big.png");
+  const rejected = await request(port, "POST", "/api/upload.php", form);
+  assert.strictEqual(rejected.status, 413);
+  assert.strictEqual(JSON.parse(rejected.body.toString("utf8")).error, "Upload is too large.");
+
+  // The connection survives a rejected oversized upload.
+  const followUp = await request(port, "GET", "/index.html");
+  assert.strictEqual(followUp.status, 200);
+
+  // A legal-size multipart body is still accepted end to end.
+  const ok = await request(port, "POST", "/api/upload.php",
+    multipart({}, "media", validPng(), "fine.png"));
+  assert.strictEqual(ok.status, 200, ok.body.toString("utf8"));
+});
+
+
 test("concurrent puts do not drop records", async (t) => {
   const server = rt.createServer();
   const port = await listen(server);

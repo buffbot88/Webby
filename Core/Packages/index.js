@@ -512,6 +512,19 @@ const PackageCoreSystem = (() => {
       const existing = recordsById[normalized.id];
       if (existing) {
         const health = getManifestHealth(normalized);
+        // Reconcile must be a no-op when nothing changed: bumping updatedAt on
+        // every boot rewrites the whole store on each server start and makes
+        // runtime-written files impossible to keep out of version control.
+        const unchanged =
+          existing.name === normalized.name &&
+          existing.version === normalized.version &&
+          existing.type === normalized.type &&
+          JSON.stringify(existing.manifest || {}) === JSON.stringify(normalized) &&
+          JSON.stringify(existing.health || {}) === JSON.stringify(health);
+        if (unchanged) {
+          installed.push(existing);
+          continue;
+        }
         const updatedRecord = {
           ...existing,
           name: normalized.name,
