@@ -20,7 +20,11 @@
  *
  * Configuration:
  * - WEBBYOS_STORAGE_SECRET overrides the storage secret. It must match the
- *   secret used by api/data.php for existing stores to decrypt.
+ *   secret used by api/data.php for existing stores to decrypt. When unset,
+ *   the server generates and persists a random secret (database/.storage-secret)
+ *   for fresh installs, and refuses to boot in production without an explicit
+ *   secret. Committed stores encrypted with the historical public default are
+ *   therefore unreadable to any new deployment.
  * - WEBBYOS_DATA_DIR / WEBBYOS_UPLOADS_DIR relocate the encrypted stores and
  *   the upload directory (useful when data must live outside the app root).
  * - PORT / HOST control the listen address (defaults 8080 / 0.0.0.0).
@@ -37,6 +41,8 @@ const { Readable } = require("node:stream");
 
 const ROOT = __dirname;
 
+const LEGACY_PUBLIC_SECRET = "CHANGE_THIS_SECRET_BEFORE_PRODUCTION";
+
 // Resolved lazily so deployments (and tests) can relocate storage via env.
 function databaseDir() {
   const override = process.env.WEBBYOS_DATA_DIR;
@@ -48,8 +54,68 @@ function uploadsDir() {
   return override ? path.resolve(override) : path.join(ROOT, "uploads");
 }
 
-const STORAGE_SECRET =
-  process.env.WEBBYOS_STORAGE_SECRET || "CHANGE_THIS_SECRET_BEFORE_PRODUCTION";
+// The historical hardcoded secret is public knowledge (it ships in the repo),
+// so stores written with it are readable by anyone. Resolution order:
+//   1. WEBBYOS_STORAGE_SECRET (explicit, always wins).
+//   2. A previously generated random secret persisted to database/.storage-secret.
+//   3. Otherwise: generate a random secret and persist it. This rotates away
+//      from the public default, so stores committed to the repo cannot be
+//      decrypted by a new deployment - they are treated as empty and the app
+//      re-seeds itself.
+// Production (NODE_ENV=production) never reaches 3: it refuses to boot without
+// an explicit secret, because a generated one cannot survive redeploys on
+// ephemeral filesystems.
+function resolveStorageSecret() {
+  const fromEnv = process.env.WEBBYOS_STORAGE_SECRET;
+  if (fromEnv) return fromEnv;
+
+  const isProduction = process.env.NODE_ENV === "production";
+  const secretFile = path.join(databaseDir(), ".storage-secret");
+
+  try {
+    const persisted = fs.readFileSync(secretFile, "utf8").trim();
+    if (persisted) return persisted;
+  } catch {
+    // No persisted secret yet; fall through.
+  }
+
+  if (isProduction) {
+    throw new Error(
+      "Refusing to start in production without WEBBYOS_STORAGE_SECRET. " +
+        "The built-in default is public and must not protect real data."
+    );
+  }
+
+  let hasLegacyStores = false;
+  try {
+    hasLegacyStores = fs
+      .readdirSync(databaseDir())
+      .some((entry) => entry.endsWith(".enc"));
+  } catch {
+    hasLegacyStores = false;
+  }
+  if (hasLegacyStores) {
+    console.error(
+      "[webbyos] WARNING: rotating the storage secret. Existing stores were " +
+        "encrypted with the public default and will be treated as empty; the " +
+        "app re-seeds itself. Set WEBBYOS_STORAGE_SECRET to read them instead."
+    );
+  }
+
+  const generated = crypto.randomBytes(32).toString("hex");
+  try {
+    fs.mkdirSync(databaseDir(), { recursive: true });
+    fs.writeFileSync(secretFile, `${generated}\n`, { mode: 0o600 });
+  } catch (error) {
+    // A secret that cannot be persisted would change on every restart and
+    // orphan every store, so this is fatal even in development.
+    throw new Error(`Unable to persist the generated storage secret: ${error}`);
+  }
+  return generated;
+}
+
+const STORAGE_SECRET = resolveStorageSecret();
+void LEGACY_PUBLIC_SECRET;
 const KEY = crypto.createHash("sha256").update(STORAGE_SECRET).digest();
 const WRITE_CIPHER = "aes-256-gcm";
 const GCM_CIPHER = "aes-256-gcm";
@@ -143,7 +209,13 @@ function encryptStore(plaintext) {
   });
 }
 
-function decryptStore(payload) {
+// Attempt decryption strictly against the resolved runtime key.
+function decryptStoreWithCurrentKey(payload) {
+  return decryptStore(payload, KEY);
+}
+
+function decryptStore(payload, keyOverride) {
+  const activeKey = keyOverride || KEY;
   let envelope;
   try {
     envelope = JSON.parse(payload);
@@ -167,7 +239,7 @@ function decryptStore(payload) {
   try {
     if (cipher === GCM_CIPHER) {
       if (typeof tag !== "string") return null;
-      const decipher = crypto.createDecipheriv(cipher, KEY, ivBuffer);
+      const decipher = crypto.createDecipheriv(cipher, activeKey, ivBuffer);
       decipher.setAuthTag(Buffer.from(tag, "base64"));
       return Buffer.concat([
         decipher.update(dataBuffer),
@@ -175,7 +247,7 @@ function decryptStore(payload) {
       ]).toString("utf8");
     }
     if (cipher === CBC_CIPHER) {
-      const decipher = crypto.createDecipheriv(cipher, KEY, ivBuffer);
+      const decipher = crypto.createDecipheriv(cipher, activeKey, ivBuffer);
       return Buffer.concat([
         decipher.update(dataBuffer),
         decipher.final()
@@ -248,10 +320,14 @@ async function readStore(store, allowUnreadable) {
     throw new StoreError("Unable to read store data.");
   }
 
-  const plaintext = decryptStore(payload);
+  const plaintext = decryptStoreWithCurrentKey(payload);
   if (plaintext === null) {
+    // Committed stores were encrypted with the historical public default
+    // secret. They are unreadable (by design) for any deployment using a
+    // rotated or generated secret, so treat them as an empty store instead of
+    // failing every request - the app re-seeds itself on first boot.
     if (allowUnreadable) return { records: [], storeWarning: "unreadable" };
-    throw new StoreError("Unable to decrypt store data.");
+    return { records: [] };
   }
 
   let decoded;
@@ -306,9 +382,30 @@ function phpNow() {
  * HTTP helpers
  * ------------------------------------------------------------------------ */
 
+// Security headers applied to every response, JSON and static alike. The CSP
+// must keep 'unsafe-inline' for scripts and styles: the app ships an inline
+// boot script in index.html and module templates rely on inline event handlers.
+const SECURITY_HEADERS = {
+  "Content-Security-Policy": [
+    "default-src 'self'",
+    "script-src 'self' 'unsafe-inline'",
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' data: blob:",
+    "connect-src 'self'",
+    "font-src 'self'",
+    "object-src 'none'",
+    "base-uri 'self'",
+    "frame-ancestors 'none'"
+  ].join("; "),
+  "X-Content-Type-Options": "nosniff",
+  "X-Frame-Options": "DENY",
+  "Referrer-Policy": "no-referrer"
+};
+
 function sendJson(res, status, payload) {
   const body = Buffer.from(JSON.stringify(payload), "utf8");
   res.writeHead(status, {
+    ...SECURITY_HEADERS,
     "Content-Type": "application/json; charset=utf-8",
     "Content-Length": body.length,
     "Cache-Control": "no-store"
@@ -362,7 +459,9 @@ function isBlockedPath(relativePath) {
         segment === "database" ||
         segment === "node_modules" ||
         segment === ".git" ||
-        segment.startsWith(".env")
+        // Any dotfile segment is blocked: .gitignore, .gitattributes, .env*,
+        // .htaccess, etc. are install/configuration details, not site content.
+        segment.startsWith(".")
     )
   ) {
     return true;
@@ -422,6 +521,7 @@ async function serveStatic(req, res, pathname) {
 
   const type = MIME_TYPES[path.extname(filePath).toLowerCase()] || "application/octet-stream";
   res.writeHead(200, {
+    ...SECURITY_HEADERS,
     "Content-Type": type,
     "Content-Length": stat.size,
     "Cache-Control": "no-cache"
@@ -665,6 +765,61 @@ function detectImageMime(buffer) {
   return "";
 }
 
+// Beyond the magic-byte sniff, verify the payload is structurally a real
+// image - the closest equivalent of PHP's getimagesize() gate in api/upload.php,
+// which a bare PNG header followed by garbage would have failed. Each parser
+// checks enough of the container structure to reject header-only fakes.
+function looksLikeRealImage(buffer, mime) {
+  if (mime === "image/png") {
+    if (buffer.length < 33) return false;
+    // Signature + IHDR chunk (length, type) + fixed IHDR fields.
+    if (buffer.readUInt32BE(8) !== 13) return false;
+    if (buffer.subarray(12, 16).toString("ascii") !== "IHDR") return false;
+    const width = buffer.readUInt32BE(16);
+    const height = buffer.readUInt32BE(20);
+    if (width === 0 || height === 0) return false;
+    if (width > 65535 || height > 65535) return false;
+    const bitDepth = buffer[24];
+    const colorType = buffer[25];
+    const validDepths = colorType === 3 ? [1, 2, 4, 8] : [8, 16];
+    return validDepths.includes(bitDepth) && [0, 2, 3, 4, 6].includes(colorType);
+  }
+  if (mime === "image/jpeg") {
+    // Walk the marker segments to a mandatory SOFn frame header.
+    let offset = 2;
+    while (offset + 4 <= buffer.length) {
+      if (buffer[offset] !== 0xff) return false;
+      const marker = buffer[offset + 1];
+      if (marker === 0xd8 || (marker >= 0xd0 && marker <= 0xd9)) {
+        offset += 2;
+        continue;
+      }
+      const length = buffer.readUInt16BE(offset + 2);
+      if (length < 2) return false;
+      if (marker >= 0xc0 && marker <= 0xcf && marker !== 0xc4 && marker !== 0xc8 && marker !== 0xcc) {
+        return offset + 2 + length <= buffer.length;
+      }
+      offset += 2 + length;
+    }
+    return false;
+  }
+  if (mime === "image/gif") {
+    if (buffer.length < 14) return false;
+    // Logical screen descriptor must declare a non-zero canvas.
+    return buffer.readUInt16LE(6) > 0 || buffer.readUInt16LE(8) > 0;
+  }
+  if (mime === "image/webp") {
+    if (buffer.length < 30) return false;
+    const chunk = buffer.subarray(12, 16).toString("ascii");
+    // VP8 (lossy) carries a frame header; VP8L (lossless) a signature byte.
+    if (chunk === "VP8 ") return buffer[23] === 0x9d && buffer[24] === 0x01 && buffer[25] === 0x2a;
+    if (chunk === "VP8L") return buffer[21] === 0x2f;
+    if (chunk === "VP8X") return true;
+    return false;
+  }
+  return false;
+}
+
 function timestampStamp() {
   const now = new Date();
   const pad = (value) => String(value).padStart(2, "0");
@@ -700,17 +855,80 @@ async function handleUploadApi(req, res) {
   const action = String(form.get("action") || "upload");
 
   if (action === "delete") {
+    // Deleting uploads is a capability-gated operation. The requester identity
+    // is NOT taken from the form (it would be trivially spoofed): the server
+    // reads its own sessions store to find the active user, then allows the
+    // delete only for admins/moderators or the uploader of the media record
+    // that references the file.
     const filename = String(form.get("filename") || "")
       .replace(/[^a-zA-Z0-9._-]/g, "")
       .replace(/^.*[/\\]/, "");
     if (!filename) {
       return sendJson(res, 400, { error: "Missing filename." });
     }
-    const target = path.resolve(uploadsDir(), filename);
-    if (target.startsWith(uploadsDir() + path.sep)) {
-      await fsp.rm(target, { force: true }).catch(() => null);
+
+    let allowed = false;
+    try {
+      const [{ records: sessions }, { records: users }, { records: media }] = await Promise.all([
+        readStore("sessions", false),
+        readStore("users", false),
+        readStore("mediaLibrary", false)
+      ]);
+
+      const session = sessions.find(
+        (entry) => entry && typeof entry === "object" && entry.active === true
+      );
+      const requestingUser = session
+        ? users.find(
+            (entry) =>
+              entry && typeof entry === "object" &&
+              (entry.id === session.userId || entry.username === session.userId)
+          )
+        : null;
+      const role = requestingUser?.role || "";
+      const canManageMedia = role === "admin" || role === "moderator";
+
+      const owningRecord = media.find(
+        (entry) => entry && typeof entry === "object" && entry.filename === filename
+      );
+      if (canManageMedia) {
+        allowed = true;
+      } else if (owningRecord) {
+        allowed =
+          Boolean(requestingUser?.id) &&
+          requestingUser.id === owningRecord.uploaderId;
+      }
+      // Orphaned file with no owning record: only admins/moderators may clean up.
+    } catch (error) {
+      if (error instanceof StoreError) {
+        return sendJson(res, error.status, { error: error.message });
+      }
+      logServerError("upload delete (media lookup)", error);
+      return sendJson(res, 500, { error: "Store operation failed." });
     }
-    return sendJson(res, 200, { success: true });
+
+    if (!allowed) {
+      return sendJson(res, 403, {
+        error: "You do not have permission to delete this media file."
+      });
+    }
+
+    const target = path.resolve(uploadsDir(), filename);
+    if (!target.startsWith(uploadsDir() + path.sep)) {
+      return sendJson(res, 400, { error: "Invalid filename." });
+    }
+    let existed = true;
+    try {
+      await fsp.rm(target, { force: false });
+    } catch (error) {
+      if (error && error.code === "ENOENT") {
+        existed = false;
+      } else {
+        logServerError("upload delete (file remove)", error);
+        return sendJson(res, 500, { error: "Unable to delete media file." });
+      }
+    }
+    return sendJson(res, 200, { success: true, deleted: existed });
   }
 
   if (action !== "upload") {
@@ -735,6 +953,11 @@ async function handleUploadApi(req, res) {
   const mime = detectImageMime(buffer);
   if (!mime || !ALLOWED_IMAGE_TYPES[mime]) {
     return sendJson(res, 400, { error: "Unsupported file type." });
+  }
+  // Magic bytes alone are not enough: a few forged header bytes wrapped around
+  // garbage must fail exactly like PHP's getimagesize() check did.
+  if (!looksLikeRealImage(buffer, mime)) {
+    return sendJson(res, 400, { error: "File is not a valid image." });
   }
 
   try {

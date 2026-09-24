@@ -285,23 +285,36 @@ Or use:
 `server.js` keeps the frontend contract and the on-disk storage format intact:
 
 - Serves `index.html`, `assets/`, `Core/`, `modules/`, `layouts/`, and `uploads/`.
-- Blocks web access to `database/` and any `.enc`, `.bak`, `.php`, or dotfile path.
+- Blocks web access to `database/`, `node_modules/`, `.git/`, `.env*`, and any
+  path containing a dotfile segment, or ending in `.enc`, `.bak`, or `.php`.
 - Implements the full `DataCoreSystem` action set: `list`, `get`, `put`, `update`,
   `remove`, `clear`, and `export`, with identical request/response shapes.
-- Implements the `MediaCoreSystem` upload endpoint (5 MB limit, image-only magic
-  byte validation, `action=upload|delete`).
+- Implements the `MediaCoreSystem` upload endpoint (5 MB limit, structural image
+  validation equivalent to PHP's `getimagesize()` gate, `action=upload|delete`;
+  deletes require the active session to be an admin/moderator or the uploader
+  of the media record that owns the file).
 - Reads both `aes-256-gcm` and legacy `aes-256-cbc` store envelopes, and writes
   `aes-256-gcm` using atomic replace, matching what current PHP builds produce.
 
 Configuration:
 
-- `WEBBYOS_STORAGE_SECRET` must match the secret used by `api/data.php`;
-  it defaults to the same placeholder so existing stores stay readable.
+- `WEBBYOS_STORAGE_SECRET` sets the storage secret explicitly. When unset, the
+  server generates and persists a random secret to `database/.storage-secret`
+  (git-ignored) for fresh installs; existing local stores keep working with the
+  historical default and a loud warning. In production (`NODE_ENV=production`)
+  the server refuses to boot without an explicit secret. Stores committed to
+  the repository were encrypted with the historical public default and are
+  therefore intentionally unreadable to any deployment using a rotated or
+  generated secret - the app re-seeds itself in that case.
 - `WEBBYOS_DATA_DIR` and `WEBBYOS_UPLOADS_DIR` relocate the encrypted stores and
   upload directory when data must live outside the app root.
 
 > The `database/` folder remains a development placeholder. Set a real
-> `WEBBYOS_STORAGE_SECRET` before any production deployment.
+> `WEBBYOS_STORAGE_SECRET` before any production deployment, and change the
+> seeded account passwords (admin/admin123, mod/mod123, user/user123) right
+> after first boot. Passwords are stored as PBKDF2-SHA256 hashes (210k
+> iterations, per-user salt); legacy plaintext records are upgraded
+> automatically on the next successful login.
 
 ---
 

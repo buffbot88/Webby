@@ -102,7 +102,14 @@ const MediaCoreSystem = (() => {
     const form = new FormData();
     form.append("action", "delete");
     form.append("filename", item.filename);
-    await fetch(UPLOAD_ENDPOINT, { method: "POST", body: form }).catch(() => null);
+    // The server now enforces delete authorization itself (via its session
+    // store), so a denied request must abort the record removal instead of
+    // silently leaving an orphan behind or deleting a record for a live file.
+    const response = await fetch(UPLOAD_ENDPOINT, { method: "POST", body: form });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok || data.error) {
+      throw new Error(data.error || "Media deletion failed.");
+    }
     return window.DataCoreSystem.remove(STORE, item.id);
   }
 

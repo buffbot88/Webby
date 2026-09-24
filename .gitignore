@@ -7,5 +7,8 @@ database/sessions.enc
 # Uploaded media written by the media system at runtime.
 uploads/
 
+# Per-install storage secret. Never commit this: it decrypts every store.
+database/.storage-secret
+
 # Installed dependencies, if any are ever added.
 node_modules/

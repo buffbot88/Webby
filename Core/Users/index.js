@@ -1,7 +1,18 @@
-// UserCoreSystem is a local development identity layer.
-// Production authentication must be implemented through a secure backend/API.
+// UserCoreSystem is the identity layer.
+//
+// Passwords are never stored in plaintext: on signup (and on first login of a
+// legacy plaintext record) the password is run through PBKDF2-SHA256 with a
+// per-user random salt via WebCrypto, and only the derived hash is persisted.
+// The seed credentials below are documented defaults for a fresh install -
+// change them immediately on any real deployment.
 const UserCoreSystem = (() => {
 
+  const PBKDF2_ITERATIONS = 210000;
+  const PBKDF2_HASH = "SHA-256";
+  const PASSWORD_HASH_PREFIX = "pbkdf2$";
+
+  // Seed passwords are kept as literals ONLY in this table and are converted
+  // to salted hashes the moment the seed records are written to the store.
   const DEFAULT_USERS = [
     {
       username: "admin",
@@ -25,6 +36,87 @@ const UserCoreSystem = (() => {
       role: "user"
     }
   ];
+
+  function bufferToBase64(buffer) {
+    const bytes = new Uint8Array(buffer);
+    let binary = "";
+    for (let i = 0; i < bytes.length; i += 1) {
+      binary += String.fromCharCode(bytes[i]);
+    }
+    return btoa(binary);
+  }
+
+  function base64ToBuffer(value) {
+    const binary = atob(value);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i += 1) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    return bytes.buffer;
+  }
+
+  async function hashPassword(password, saltBase64) {
+    const cryptoObject = window.crypto || window.msCrypto;
+    if (!cryptoObject?.subtle) {
+      throw new Error("WebCrypto is unavailable; unable to hash passwords.");
+    }
+    const encoder = new TextEncoder();
+    const salt = saltBase64
+      ? new Uint8Array(base64ToBuffer(saltBase64))
+      : cryptoObject.getRandomValues(new Uint8Array(16));
+    const keyMaterial = await cryptoObject.subtle.importKey(
+      "raw",
+      encoder.encode(password),
+      "PBKDF2",
+      false,
+      ["deriveBits"]
+    );
+    const derived = await cryptoObject.subtle.deriveBits(
+      {
+        name: "PBKDF2",
+        salt,
+        iterations: PBKDF2_ITERATIONS,
+        hash: PBKDF2_HASH
+      },
+      keyMaterial,
+      256
+    );
+    return {
+      salt: bufferToBase64(salt.buffer),
+      hash: bufferToBase64(derived)
+    };
+  }
+
+  function isHashedPassword(value) {
+    return typeof value === "string" && value.startsWith(PASSWORD_HASH_PREFIX);
+  }
+
+  async function encodePassword(password) {
+    const { salt, hash } = await hashPassword(password);
+    return `${PASSWORD_HASH_PREFIX}${PBKDF2_ITERATIONS}$${salt}$${hash}`;
+  }
+
+  async function verifyPassword(password, stored) {
+    if (!isHashedPassword(stored)) {
+      // Legacy plaintext record: compare directly and let the caller upgrade.
+      return { matches: password === stored, needsUpgrade: true };
+    }
+    const [, iterationsRaw, salt, expectedHash] = stored.split("$");
+    const iterations = Number(iterationsRaw);
+    if (!iterations || !salt || !expectedHash) {
+      return { matches: false, needsUpgrade: false };
+    }
+    const { hash } = await hashPassword(password, salt);
+    // Constant-time-ish comparison over equal-length base64 strings.
+    if (hash.length !== expectedHash.length) {
+      return { matches: false, needsUpgrade: false };
+    }
+    let difference = 0;
+    for (let i = 0; i < hash.length; i += 1) {
+      difference |= hash.charCodeAt(i) ^ expectedHash.charCodeAt(i);
+    }
+    return { matches: difference === 0, needsUpgrade: false };
+  }
 
   let users = [];
   let currentUser = null;
@@ -253,11 +345,19 @@ const UserCoreSystem = (() => {
   async function seedDefaultUsers() {
     if (users.length > 0) return;
 
-    users = DEFAULT_USERS.map((entry) => normalizeUser({
-      ...entry,
-      id: normalizeUsername(entry.username),
-      joinedAt: new Date().toISOString()
-    }));
+    // Seed passwords are converted to salted hashes before anything is
+    // persisted - the store never receives the plaintext literals.
+    const seeded = [];
+    for (const entry of DEFAULT_USERS) {
+      const passwordHash = await encodePassword(entry.password);
+      seeded.push(normalizeUser({
+        ...entry,
+        password: passwordHash,
+        id: normalizeUsername(entry.username),
+        joinedAt: new Date().toISOString()
+      }));
+    }
+    users = seeded;
 
     await saveUsers();
   }
@@ -347,16 +447,33 @@ const UserCoreSystem = (() => {
     }
 
     return "";
-  }
-
-  async function authenticate(username, password) {
+  }  async function authenticate(username, password) {
     await loadUsers();
     const user = findUser(username);
-    if (!user || user.password !== password) {
+    if (!user) {
       setStatusMessage("Invalid username or password.");
       return false;
     }
+
+    const { matches, needsUpgrade } = await verifyPassword(password, user.password);
+    if (!matches) {
+      setStatusMessage("Invalid username or password.");
+      return false;
+    }
+
+    // Transparent upgrade: a legacy plaintext record becomes a salted hash on
+    // its first successful login.
+    if (needsUpgrade) {
+      try {
+        user.password = await encodePassword(password);
+        await saveUsers();
+      } catch (err) {
+        Diagnostics?.warn?.("[UserCoreSystem] failed to upgrade legacy password hash", err);
+      }
+    }
+
     currentUser = user;
+
     await saveSession();
     setStatusMessage("Signed in successfully.");
     updateRuntimeState();
@@ -377,10 +494,11 @@ const UserCoreSystem = (() => {
       return false;
     }
 
+    const passwordHash = await encodePassword(password);
     const newUser = normalizeUser({
       id: normalizedUsername,
       username: normalizedUsername,
-      password,
+      password: passwordHash,
       displayName,
       bio,
       role: "user",
