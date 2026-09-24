@@ -1,4 +1,4 @@
-﻿# WebbyOS
+# WebbyOS
 
 WebbyOS is a modular self-hosted community ecosystem platform built with vanilla JavaScript and lightweight PHP persistence services.
 
@@ -153,6 +153,8 @@ These systems completed the v0.47 public UX productization phase and passed the 
 ```text
 .
 |-- index.html
+|-- server.js
+|-- package.json
 |-- registry.json
 |-- config.json
 |-- TODO.md
@@ -239,7 +241,29 @@ These systems completed the v0.47 public UX productization phase and passed the 
 
 ## Local Development
 
-Run a lightweight PHP server:
+### Node runtime (default)
+
+`server.js` serves the static site and provides drop-in replacements for the
+`api/data.php` and `api/upload.php` endpoints, so WebbyOS runs on Node-only
+hosts that have no PHP interpreter:
+
+```bash
+bun install        # no dependencies today; keeps the lockfile/install step healthy
+bun run dev        # or: node server.js
+```
+
+Then open:
+
+```text
+http://127.0.0.1:8080/
+```
+
+The listener honours `PORT` and `HOST` (defaults `8080` and `0.0.0.0`), which is
+what managed preview environments inject.
+
+### PHP hosting
+
+The original PHP persistence bridge is retained for classic hosting:
 
 ```bash
 php -S 127.0.0.1:8080
@@ -251,11 +275,33 @@ Or use:
 - Nginx + PHP
 - other lightweight PHP hosting
 
-Then open:
+`index.html` is unchanged between the two runtimes: `DataCoreSystem` still calls
+`./api/data.php` and `MediaCoreSystem` still calls `./api/upload.php`.
 
-```text
-http://127.0.0.1:8080/
-```
+---
+
+# Runtime Compatibility Layer
+
+`server.js` keeps the frontend contract and the on-disk storage format intact:
+
+- Serves `index.html`, `assets/`, `Core/`, `modules/`, `layouts/`, and `uploads/`.
+- Blocks web access to `database/` and any `.enc`, `.bak`, `.php`, or dotfile path.
+- Implements the full `DataCoreSystem` action set: `list`, `get`, `put`, `update`,
+  `remove`, `clear`, and `export`, with identical request/response shapes.
+- Implements the `MediaCoreSystem` upload endpoint (5 MB limit, image-only magic
+  byte validation, `action=upload|delete`).
+- Reads both `aes-256-gcm` and legacy `aes-256-cbc` store envelopes, and writes
+  `aes-256-gcm` using atomic replace, matching what current PHP builds produce.
+
+Configuration:
+
+- `WEBBYOS_STORAGE_SECRET` must match the secret used by `api/data.php`;
+  it defaults to the same placeholder so existing stores stay readable.
+- `WEBBYOS_DATA_DIR` and `WEBBYOS_UPLOADS_DIR` relocate the encrypted stores and
+  upload directory when data must live outside the app root.
+
+> The `database/` folder remains a development placeholder. Set a real
+> `WEBBYOS_STORAGE_SECRET` before any production deployment.
 
 ---
 

@@ -1,0 +1,15 @@
+{
+  "name": "webbyos",
+  "version": "0.50.0",
+  "private": true,
+  "description": "WebbyOS - modular self-hosted community ecosystem platform",
+  "license": "MIT",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js",
+    "check": "node --check server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
