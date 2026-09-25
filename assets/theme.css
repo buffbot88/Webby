@@ -194,7 +194,7 @@ textarea:focus {
 .forum-header h1,
 .blog-header h1,
 .calendar-header h1 {
-  margin: 0 0 6px 0;
+  margin: 0 0 4px 0;
   font-size: clamp(28px, 4vw, 40px);
   line-height: 1.08;
   letter-spacing: 0;
@@ -217,7 +217,7 @@ textarea:focus {
 .account-panels {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 16px;
+  gap: 14px;
 }
 
 .panel,
@@ -1004,6 +1004,13 @@ button.primary {
   gap: 8px;
 }
 
+/* The trigger element carries the `hidden` attribute until it has matches, but
+   the panel's own `display` rule outranks the UA `[hidden]` style, which left
+   an empty results box parked under the search field. */
+.search-results[hidden] {
+  display: none;
+}
+
 .search-result {
   display: grid;
   gap: 4px;
@@ -1261,15 +1268,14 @@ button.primary {
 
 .home-portal {
   display: grid;
-  gap: 18px;
+  gap: 16px;
 }
 
+/* The hero is a full-width page header (same treatment as the module
+   headers) with the community stats and highlights stacked beneath it. */
 .home-portal-hero {
   display: grid;
-  grid-template-columns: minmax(0, 1.25fr) minmax(220px, 0.55fr);
-  gap: 18px;
-  align-items: stretch;
-  margin-bottom: 0;
+  gap: 16px;
 }
 
 .home-hero-copy {
@@ -1277,7 +1283,12 @@ button.primary {
   align-content: center;
 }
 
-.home-hero-actions,
+/* Home sections hold dense feed lists, so they run a slightly tighter
+   frame than the generic cms-card. */
+.home-section-block {
+  padding: 16px;
+}
+
 .home-section-header,
 .home-feed-meta {
   display: flex;
@@ -1288,12 +1299,12 @@ button.primary {
 
 .home-section-header {
   justify-content: space-between;
-  margin-bottom: 14px;
+  margin-bottom: 10px;
 }
 
 .home-section-header h3 {
   margin: 0;
-  font-size: 19px;
+  font-size: 17px;
 }
 
 .home-section-subtitle {
@@ -1307,16 +1318,20 @@ button.primary {
 
 .home-hero-stats {
   display: grid;
-  gap: 10px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
 }
 
 .home-hero-stat,
 .home-spotlight-card,
 .home-quicknav-card {
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: rgba(255, 255, 255, 0.82);
-  padding: 14px;
+  border: 1px solid var(--border-glass);
+  border-radius: 16px;
+  background: var(--glass-2);
+  -webkit-backdrop-filter: blur(22px) saturate(125%);
+  backdrop-filter: blur(22px) saturate(125%);
+  box-shadow: var(--glass-reflection);
+  padding: 14px 16px;
   text-align: left;
 }
 
@@ -1357,38 +1372,53 @@ button.primary {
 .home-portal-body {
   display: grid;
   grid-template-columns: minmax(0, 1.45fr) minmax(260px, 0.75fr);
-  gap: 18px;
+  gap: 16px;
   align-items: start;
 }
 
 .home-portal-main,
 .home-portal-aside {
   display: grid;
-  gap: 18px;
+  gap: 16px;
 }
 
 .home-portal-quicknav,
 .home-portal-widgets {
   display: grid;
-  gap: 10px;
+  gap: 8px;
 }
 
 .home-quicknav-grid,
 .home-widget-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 8px;
 }
 
+/* The Explore cards are a compact directory, so they carry a tighter
+   rhythm and no height floor, unlike the hero stats and spotlight tiles
+   they share a glass treatment with. */
 .home-quicknav-card {
   display: grid;
-  gap: 6px;
-  min-height: 116px;
+  gap: 4px;
+  min-height: 0;
+  padding: 12px 14px;
+  align-content: start;
+}
+
+.home-quicknav-label {
+  font-size: 15px;
+  line-height: 1.2;
+}
+
+.home-quicknav-copy {
+  font-size: 12.5px;
+  line-height: 1.4;
 }
 
 .home-feed-list {
   display: grid;
-  gap: 10px;
+  gap: 8px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -1396,11 +1426,15 @@ button.primary {
 
 .home-feed-item {
   display: grid;
-  gap: 6px;
+  gap: 4px;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: rgba(9, 30, 55, 0.5);
-  padding: 12px;
+  padding: 10px 12px;
+}
+
+.home-feed-meta {
+  gap: 6px;
 }
 
 .home-feed-badge {
@@ -1409,14 +1443,17 @@ button.primary {
   border-radius: 999px;
   background: rgba(41, 128, 220, 0.16);
   color: #83c9ff;
-  padding: 3px 8px;
-  font-size: 12px;
+  padding: 2px 7px;
+  font-size: 11px;
   font-weight: 900;
+  line-height: 1.4;
 }
 
 .home-feed-title {
   color: var(--text);
+  font-size: 15px;
   font-weight: 900;
+  line-height: 1.35;
   text-decoration: none;
 }
 
@@ -1427,7 +1464,13 @@ button.primary {
 
 .home-feed-excerpt {
   color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1.45;
   margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .cms-page {
@@ -1529,7 +1572,7 @@ button.primary {
 .account-shell {
   max-width: 1040px;
   display: grid;
-  gap: 18px;
+  gap: 16px;
 }
 
 .account-heading {
@@ -1547,7 +1590,7 @@ button.primary {
 .account-panels {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 16px;
+  gap: 14px;
 }
 
 .auth-card,
@@ -1555,7 +1598,7 @@ button.primary {
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 18px;
+  padding: 16px;
   box-shadow: var(--shadow-soft);
 }
 
@@ -1570,20 +1613,20 @@ button.primary {
 
 .auth-card form {
   display: grid;
-  gap: 12px;
-  margin-top: 14px;
+  gap: 10px;
+  margin-top: 12px;
 }
 
 .profile-card {
   display: grid;
   grid-template-columns: 1fr auto;
-  gap: 16px;
+  gap: 14px;
 }
 
 .profile-card-main {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   min-width: 0;
 }
 
@@ -1594,21 +1637,21 @@ button.primary {
 }
 
 .profile-avatar {
-  width: 68px;
-  height: 68px;
-  flex: 0 0 68px;
+  width: 60px;
+  height: 60px;
+  flex: 0 0 60px;
   border-radius: 50%;
   display: grid;
   place-items: center;
   background: rgba(6, 20, 38, 0.84);
   color: #ffffff;
-  font-size: 28px;
+  font-size: 24px;
   font-weight: 800;
   box-shadow: inset 0 0 0 4px rgba(255, 255, 255, 0.12);
 }
 
 .profile-name {
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 800;
   line-height: 1.15;
   overflow-wrap: anywhere;
@@ -1621,10 +1664,10 @@ button.primary {
 
 .profile-bio {
   grid-column: 1 / -1;
-  line-height: 1.6;
+  line-height: 1.55;
   color: var(--text-secondary);
   border-top: 1px solid var(--border);
-  padding-top: 14px;
+  padding-top: 12px;
   overflow-wrap: anywhere;
 }
 
@@ -1670,7 +1713,7 @@ button.primary {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-top: 12px;
+  margin-top: 10px;
 }
 
 .capability-chip {
@@ -1719,7 +1762,7 @@ button.primary {
 .account-status-list {
   display: grid;
   gap: 10px;
-  margin: 14px 0 0 0;
+  margin: 12px 0 0 0;
 }
 
 .account-status-list div {
@@ -1727,7 +1770,7 @@ button.primary {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding-bottom: 10px;
+  padding-bottom: 8px;
   border-bottom: 1px solid var(--border);
 }
 
@@ -1796,33 +1839,33 @@ button.primary {
 .forum-shell {
   max-width: 1120px;
   display: grid;
-  gap: 18px;
+  gap: 16px;
 }
 
 .forum-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 16px;
+  gap: 14px;
 }
 
 .forum-header h1 {
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 
 .forum-thread-list {
   display: grid;
-  gap: 16px;
+  gap: 12px;
 }
 
 .forum-index-list {
-  gap: 12px;
+  gap: 10px;
 }
 
 .forum-index-card {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 110px;
-  gap: 14px;
+  gap: 12px;
   align-items: start;
 }
 
@@ -1831,9 +1874,9 @@ button.primary {
 }
 
 .forum-index-excerpt {
-  margin: 12px 0 0 0;
+  margin: 10px 0 0 0;
   color: var(--text-muted);
-  line-height: 1.55;
+  line-height: 1.45;
 }
 
 .forum-index-stats {
@@ -1865,7 +1908,7 @@ button.primary {
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 18px;
+  padding: 16px;
   box-shadow: var(--shadow-soft);
 }
 
@@ -1877,7 +1920,7 @@ button.primary {
 }
 
 .forum-thread-card h3 {
-  margin: 18px 0 10px 0;
+  margin: 10px 0 6px 0;
   font-size: 15px;
 }
 
@@ -1885,20 +1928,20 @@ button.primary {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 14px;
+  gap: 12px;
 }
 
 .forum-thread-meta {
   display: flex;
   flex-wrap: wrap;
   gap: 8px 12px;
-  margin-top: 8px;
+  margin-top: 6px;
   color: var(--muted);
   font-size: 13px;
 }
 
 .forum-body {
-  margin-top: 14px;
+  margin-top: 12px;
   line-height: 1.6;
   color: var(--text-secondary);
   white-space: pre-wrap;
@@ -1954,8 +1997,8 @@ button.primary {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-top: 14px;
-  padding-top: 12px;
+  margin-top: 12px;
+  padding-top: 10px;
   border-top: 1px solid var(--border);
 }
 
@@ -1970,8 +2013,8 @@ button.primary {
 .forum-reply-form {
   display: grid;
   gap: 10px;
-  margin-top: 14px;
-  padding-top: 14px;
+  margin-top: 12px;
+  padding-top: 12px;
   border-top: 1px solid var(--border);
 }
 
@@ -2017,29 +2060,29 @@ button.primary {
 .blog-shell {
   max-width: 1080px;
   display: grid;
-  gap: 18px;
+  gap: 16px;
 }
 
 .blog-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 16px;
+  gap: 14px;
 }
 
 .blog-header h1 {
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 
 .blog-post-list {
   display: grid;
-  gap: 16px;
+  gap: 12px;
 }
 
 .blog-editorial-layout,
 .blog-post-grid {
   display: grid;
-  gap: 16px;
+  gap: 12px;
 }
 
 .blog-post-grid {
@@ -2051,7 +2094,7 @@ button.primary {
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 18px;
+  padding: 16px;
   box-shadow: var(--shadow-soft);
 }
 
@@ -2066,26 +2109,26 @@ button.primary {
 .editorial-featured-card {
   display: grid;
   grid-template-columns: minmax(240px, 0.9fr) minmax(0, 1.1fr);
-  gap: 18px;
+  gap: 12px;
   align-items: start;
 }
 
 .editorial-featured-card .cover-image,
 .editorial-featured-card .cover-placeholder {
   margin-bottom: 0;
-  min-height: 260px;
+  min-height: 220px;
 }
 
 .cover-placeholder {
   display: grid;
   place-items: center;
   width: 100%;
-  min-height: 190px;
+  min-height: 170px;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: rgba(135, 116, 255, 0.18);
   color: #a79bff;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 
 .cover-placeholder span {
@@ -2101,37 +2144,37 @@ button.primary {
 
 .blog-editor form {
   display: grid;
-  gap: 12px;
-  margin-top: 14px;
+  gap: 10px;
+  margin-top: 12px;
 }
 
 .blog-post-topline {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 14px;
+  gap: 12px;
 }
 
 .blog-post-meta {
   display: flex;
   flex-wrap: wrap;
   gap: 8px 12px;
-  margin-top: 8px;
+  margin-top: 6px;
   color: var(--muted);
   font-size: 13px;
 }
 
 .blog-excerpt {
-  margin: 14px 0 0 0;
+  margin: 12px 0 0 0;
   color: var(--text-muted);
   font-weight: 700;
-  line-height: 1.5;
+  line-height: 1.45;
   overflow-wrap: anywhere;
 }
 
 .blog-body {
-  margin-top: 14px;
-  line-height: 1.65;
+  margin-top: 12px;
+  line-height: 1.6;
   color: var(--text-secondary);
   white-space: pre-wrap;
   overflow-wrap: anywhere;
@@ -2149,7 +2192,7 @@ button.primary {
 }
 
 .blog-tag-row {
-  margin-top: 14px;
+  margin-top: 12px;
 }
 
 .blog-badge {
@@ -2188,8 +2231,8 @@ button.primary {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-top: 14px;
-  padding-top: 12px;
+  margin-top: 12px;
+  padding-top: 10px;
   border-top: 1px solid var(--border);
 }
 
@@ -2243,23 +2286,23 @@ button.primary {
 .calendar-shell {
   max-width: 1080px;
   display: grid;
-  gap: 18px;
+  gap: 16px;
 }
 
 .calendar-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 16px;
+  gap: 14px;
 }
 
 .calendar-header h1 {
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 
 .calendar-event-list {
   display: grid;
-  gap: 16px;
+  gap: 12px;
 }
 
 .calendar-event-card,
@@ -2267,7 +2310,7 @@ button.primary {
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 18px;
+  padding: 16px;
   box-shadow: var(--shadow-soft);
 }
 
@@ -2281,29 +2324,29 @@ button.primary {
 
 .calendar-editor form {
   display: grid;
-  gap: 12px;
-  margin-top: 14px;
+  gap: 10px;
+  margin-top: 12px;
 }
 
 .calendar-event-topline {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 14px;
+  gap: 12px;
 }
 
 .calendar-event-meta {
   display: flex;
   flex-wrap: wrap;
   gap: 8px 12px;
-  margin-top: 8px;
+  margin-top: 6px;
   color: var(--muted);
   font-size: 13px;
 }
 
 .calendar-body {
-  margin-top: 14px;
-  line-height: 1.65;
+  margin-top: 12px;
+  line-height: 1.6;
   color: var(--text-secondary);
   white-space: pre-wrap;
   overflow-wrap: anywhere;
@@ -2358,8 +2401,8 @@ button.primary {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-top: 14px;
-  padding-top: 12px;
+  margin-top: 12px;
+  padding-top: 10px;
   border-top: 1px solid var(--border);
 }
 
@@ -2397,17 +2440,17 @@ button.primary {
 
 .calendar-month-panel {
   display: grid;
-  gap: 12px;
+  gap: 10px;
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 18px;
+  padding: 16px;
   box-shadow: var(--shadow-soft);
 }
 
 .calendar-month-panel h2 {
   margin: 0 0 4px 0;
-  font-size: 22px;
+  font-size: 20px;
 }
 
 .calendar-month-actions {
@@ -2432,7 +2475,7 @@ button.primary {
 }
 
 .calendar-month-cell {
-  min-height: 112px;
+  min-height: 96px;
   border: 1px solid var(--border);
   border-radius: 8px;
   background: rgba(9, 30, 55, 0.5);
@@ -2449,7 +2492,7 @@ button.primary {
   color: var(--text-secondary);
   font-size: 12px;
   font-weight: 900;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .calendar-month-event {
@@ -2478,13 +2521,13 @@ button.primary {
 
 .calendar-agenda-list {
   display: grid;
-  gap: 16px;
+  gap: 12px;
 }
 
 .calendar-agenda-day {
   display: grid;
-  grid-template-columns: 160px minmax(0, 1fr);
-  gap: 14px;
+  grid-template-columns: 150px minmax(0, 1fr);
+  gap: 12px;
   align-items: start;
 }
 
@@ -2533,6 +2576,449 @@ button.primary {
 
   .calendar-month-cell {
     min-height: 82px;
+  }
+}
+
+/* =========================================================
+   MODULE DENSITY
+   Every module page shell (and the home portal) runs the same
+   rhythm: 16px between blocks, 16px inside a page header, and
+   compact module tabs. These selectors carry an extra class so
+   they win over the later Midnight Glass layer, which declares
+   the roomier frame these pages used to inherit.
+========================================================= */
+
+.page-shell.account-shell,
+.page-shell.blog-shell,
+.page-shell.forum-shell,
+.page-shell.calendar-shell,
+.page-shell.community-home-shell {
+  gap: 16px;
+}
+
+.page-shell .page-header,
+.page-shell .account-heading,
+.page-shell .forum-header,
+.page-shell .blog-header,
+.page-shell .calendar-header {
+  gap: 16px;
+  padding: 8px 0 18px;
+}
+
+.module-subnav > button {
+  padding: 8px 14px;
+}
+
+/* =========================================================
+   GLASS PARITY — remaining legacy light surfaces
+
+   Folded in from the former assets/theme-glass-parity.css.
+   theme.css's GLASS SYSTEM block migrated the main cards (panels,
+   auth cards, blog posts, forum threads, calendar events, overview
+   cards), but a set of placeholder, upload, dashboard-tile and
+   forum-index surfaces kept the pre-Midnight-Glass near-white fills,
+   so they rendered as light boxes on the dark theme.
+
+   Every selector below carries an extra `:root` ancestor. The
+   declarations they override sit further down this file — some of
+   them past the region this workspace can edit — so the block wins
+   on specificity instead of source order, exactly as the separate
+   sheet used to by loading last.
+========================================================= */
+
+/* Placeholder / empty / upload surfaces.
+   These keep a dashed border so they still read as "nothing here yet". */
+:root .forum-empty,
+:root .blog-empty,
+:root .calendar-empty,
+:root .media-empty,
+:root .media-alert,
+:root .media-upload,
+:root .search-empty,
+:root .taxonomy-empty,
+:root .builder-empty,
+:root .module-empty-state,
+:root .portal-empty-state {
+  background: var(--glass-1);
+  -webkit-backdrop-filter: blur(16px) saturate(120%);
+  backdrop-filter: blur(16px) saturate(120%);
+  border: 1px dashed rgba(135, 192, 255, 0.28);
+  box-shadow: var(--glass-reflection);
+}
+
+/* The old sheet also re-filled the home dashboard tiles
+   (.home-hero-stat / .home-spotlight-card / .home-quicknav-card);
+   those take the glass tokens directly in the HOME PORTAL block now,
+   so that rule was dropped on the way in.
+
+   Same migration leftover, different symptom: these kept a legacy
+   light-theme tint (slate-900 at 4-8%), which on the dark theme is not
+   a light box but no fill at all, leaving the count pill and the
+   ledger chips looking like bare text. */
+:root .social-count,
+:root .forum-thread-ledger span,
+:root .blog-editorial-ledger span,
+:root .calendar-event-ledger span {
+  background: var(--glass-1);
+}
+
+/* =========================================================
+   PAGE HERO ACTIONS
+
+   The hero's right-hand slot ("+ New Thread") is a primary action,
+   not a filter control, so it gets the display-grade sizing from the
+   spec and keeps the gradient button's glow on hover only.
+========================================================= */
+
+:root .hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
+
+:root .hero-actions svg {
+  width: 18px;
+  height: 18px;
+}
+
+:root .hero-actions .button-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 46px;
+  padding: 0 22px;
+}
+
+/* =========================================================
+   FORUMS — RECENT DISCUSSIONS PANEL
+
+   One glass panel owns the heading, the tools and the rows, so the
+   discussion list reads as a single surface instead of a stack of
+   separate cards (spec section 10).
+========================================================= */
+
+:root .forum-index-panel {
+  border-radius: 20px;
+  border: 1px solid var(--border-glass);
+  background: var(--glass-2);
+  -webkit-backdrop-filter: blur(22px) saturate(125%);
+  backdrop-filter: blur(22px) saturate(125%);
+  box-shadow: var(--glass-reflection);
+  overflow: hidden;
+}
+
+:root .forum-panel-head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--hairline);
+}
+
+:root .forum-panel-head .panel-title {
+  flex: 1 1 auto;
+  margin: 0;
+}
+
+:root .forum-sort {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+:root .forum-sort select {
+  appearance: none;
+  height: 38px;
+  padding: 0 36px 0 14px;
+  border-radius: 11px;
+  border: 1px solid var(--border-glass);
+  background: rgba(3, 15, 30, 0.52);
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+:root .forum-sort::after {
+  content: "";
+  position: absolute;
+  right: 15px;
+  width: 7px;
+  height: 7px;
+  border-right: 1.6px solid var(--text-muted);
+  border-bottom: 1.6px solid var(--text-muted);
+  transform: rotate(45deg) translateY(-2px);
+  pointer-events: none;
+}
+
+/* the tools row reuses the panel surface instead of a second card */
+:root .forum-index-panel .search-tools {
+  margin: 0;
+  padding: 14px 22px;
+  border-bottom: 1px solid var(--hairline);
+  background: transparent;
+}
+
+:root .forum-index-panel .search-tools input,
+:root .forum-index-panel .search-tools select {
+  min-width: 200px;
+  height: 40px;
+  padding: 0 14px;
+  border-radius: 11px;
+  border: 1px solid rgba(140, 194, 255, 0.3);
+  background: rgba(3, 15, 30, 0.52);
+  color: var(--text-primary);
+  font-size: 13.5px;
+}
+
+/* the list keeps theme.css's hairline rows, only the container drops away */
+:root .forum-index-panel .forum-thread-list {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow: none;
+}
+
+/* =========================================================
+   FORUMS — INDEX ROWS
+
+   icon tile - title + excerpt - meta cluster (tag, counts, time).
+   Rows stay borderless; theme.css supplies the hairline separators.
+========================================================= */
+
+:root .forum-index-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: center;
+  min-height: 78px;
+  padding: 14px 22px;
+}
+
+:root .forum-row-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  border: 1px solid rgba(130, 192, 245, 0.22);
+  background: rgba(29, 76, 120, 0.25);
+  color: var(--cyan);
+}
+
+:root .forum-row-icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+:root .forum-row-icon[data-tone="violet"] {
+  border-color: rgba(135, 116, 255, 0.34);
+  background: rgba(135, 116, 255, 0.16);
+  color: #b9adff;
+}
+
+:root .forum-row-icon[data-tone="gold"] {
+  border-color: rgba(225, 188, 114, 0.34);
+  background: rgba(225, 188, 114, 0.14);
+  color: var(--gold);
+}
+
+:root .forum-row-main {
+  min-width: 0;
+}
+
+:root .forum-row-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 15.5px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+:root .forum-row-title .link-button {
+  padding: 0;
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+  font-size: 15.5px;
+  font-weight: 600;
+  text-align: left;
+}
+
+:root .forum-row-title .link-button:hover {
+  background: transparent;
+  color: var(--cyan);
+}
+
+:root .forum-row-excerpt {
+  margin: 5px 0 0;
+  color: var(--text-muted);
+  font-size: 13.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+:root .forum-row-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+:root .forum-row-stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 42px;
+}
+
+:root .forum-row-stat svg {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 auto;
+}
+
+:root .forum-row-stat[data-tone="rose"] {
+  color: var(--rose);
+}
+
+:root .forum-row-time {
+  min-width: 64px;
+  text-align: right;
+  font-weight: 500;
+}
+
+:root .forum-row-chevron {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  color: var(--text-muted);
+  transition: color 180ms ease, transform 180ms ease;
+}
+
+:root .forum-row-chevron svg {
+  width: 18px;
+  height: 18px;
+}
+
+:root .forum-index-row:hover .forum-row-chevron {
+  color: var(--cyan);
+  transform: translateX(2px);
+}
+
+/* moderation controls keep their own full-width row inside the card */
+:root .forum-index-row > .forum-action-bar {
+  grid-column: 1 / -1;
+  border-top: 0;
+  padding-top: 0;
+}
+
+/* compact category pills, toned per category (spec section 12) */
+:root .forum-tag {
+  min-height: 24px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(65, 165, 255, 0.55);
+  background: rgba(20, 109, 190, 0.2);
+  color: #83c9ff;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+:root .forum-tag[data-tone="violet"] {
+  border-color: rgba(135, 116, 255, 0.55);
+  background: rgba(101, 84, 214, 0.2);
+  color: #b9adff;
+}
+
+:root .forum-tag[data-tone="gold"] {
+  border-color: rgba(225, 188, 114, 0.6);
+  background: rgba(225, 188, 114, 0.16);
+  color: var(--gold);
+}
+
+/* responsive: collapse the metadata cluster before the rail does (spec 15) */
+@media (max-width: 900px) {
+  :root .forum-row-time {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  :root .forum-index-row {
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 12px;
+    padding: 14px 16px;
+  }
+
+  :root .forum-row-meta {
+    grid-column: 2;
+    gap: 12px;
+    font-size: 12px;
+  }
+
+  :root .forum-row-chevron {
+    display: none;
+  }
+
+  :root .hero-actions {
+    margin-left: 0;
+  }
+}
+
+/* =========================================================
+   ENVIRONMENT SELECTION
+
+   The base environment is the desktop valley. These two rules swap
+   in the natively authored compositions that a single artwork cannot
+   serve: a wider scene for ultrawide displays, and an alternate
+   composition for authentication surfaces.
+========================================================= */
+
+/* Ultrawide: at 2200px and up the desktop scene is scaled past its
+   native width and cropped, so the citadel drifts out of frame. */
+@media (min-width: 2200px) {
+  :root .app-background-art {
+    background-image: url("./brand/webby-night-ultrawide.svg");
+    background-position: center 36%;
+  }
+}
+
+/* Authentication surface: same world, alternate composition, with the
+   crystal architecture held to the right so the sign-in panel sits on
+   the near-dark left half.
+
+   Reached by setting data-background-mode="auth" on the document root.
+   configLoader.js currently normalises that attribute against
+   ["soft", "plain", "contrast"], so this value needs to be added to that
+   allowlist (and to the Admin theme select) before it can be selected. */
+:root[data-background-mode="auth"] .app-background-art {
+  background-image: url("./brand/webby-auth.svg");
+  background-position: center 44%;
+}
+
+:root[data-background-mode="auth"] .app-background::after {
+  background:
+    radial-gradient(120% 90% at 78% 8%, rgba(3, 12, 26, 0.1), rgba(1, 6, 12, 0.86) 76%),
+    linear-gradient(rgba(1, 6, 12, 0.42), rgba(1, 6, 12, 0.84));
+}
+
+/* On small screens the auth composition is cropped to a narrow slice, so
+   fall back to the portrait scene and keep the panel legible. */
+@media (max-width: 768px) {
+  :root[data-background-mode="auth"] .app-background-art {
+    background-image: url("./brand/webby-night-portrait.svg");
   }
 }
 
@@ -3094,19 +3580,19 @@ button.primary {
 .forum-category-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px;
+  gap: 14px;
 }
 
 .forum-category-card {
   display: grid;
-  grid-template-columns: 54px minmax(0, 1fr) 20px;
+  grid-template-columns: 46px minmax(0, 1fr) 20px;
   align-items: center;
-  gap: 16px;
-  min-height: 146px;
-  padding: 20px 22px;
+  gap: 14px;
+  min-height: 118px;
+  padding: 16px 18px;
   text-align: left;
   border: 1px solid var(--border-glass);
-  border-radius: 20px;
+  border-radius: 18px;
   background: var(--glass-2);
   backdrop-filter: blur(22px) saturate(125%);
   -webkit-backdrop-filter: blur(22px) saturate(125%);
@@ -3131,17 +3617,17 @@ button.primary {
 .forum-category-icon {
   display: grid;
   place-items: center;
-  width: 52px;
-  height: 52px;
-  border-radius: 16px;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
   border: 1px solid rgba(130, 192, 245, 0.22);
   background: rgba(29, 76, 120, 0.25);
   color: var(--text-secondary);
 }
 
 .forum-category-icon svg {
-  width: 26px;
-  height: 26px;
+  width: 22px;
+  height: 22px;
 }
 
 .forum-category-card[data-tone="cyan"] .forum-category-icon {

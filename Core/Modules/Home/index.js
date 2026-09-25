@@ -259,21 +259,10 @@
       return `<div class="home-spotlight-grid">${[1, 2, 3].map(() => `<div class="home-spotlight-card portal-empty-state is-loading glass"><strong>Loading</strong><p>Preparing portal highlights.</p></div>`).join("")}</div>`;
     }
 
+    // The Explore row below already covers module discovery, so an empty
+    // spotlight would add boxes without adding information.
     if (!spotlightItems.length) {
-      return `
-        <div class="home-spotlight-grid">
-          ${[
-            ["Editorial", "Publish articles and updates from the blog module.", "blog"],
-            ["Discussions", "Start forum threads and replies for community conversation.", "forums"],
-            ["Events", "Schedule public events with dates, locations, and images.", "calendar"]
-          ].map(([label, body, route]) => `
-            <button type="button" class="home-spotlight-card glass" onclick="Runtime.navigate('${escape(route)}')">
-              <span>${escape(label)}</span>
-              <strong>${escape(body)}</strong>
-            </button>
-          `).join("")}
-        </div>
-      `;
+      return "";
     }
 
     return `
@@ -313,17 +302,19 @@
   function renderHero() {
     const hero = builderConfig().hero || {};
     return `
-      <section class="home-portal-hero panel">
-        <div class="home-hero-copy">
-          <div class="section-eyebrow">${escape(hero.kicker || "Community portal")}</div>
-          <h1 class="page-title">${escape(hero.title || "Welcome to our community hub")}</h1>
-          <p class="page-subtitle">${escape(hero.body || "Explore the latest articles, discussions, events, and community activities.")}</p>
-          <div class="home-hero-actions">
-            <button type="button" class="primary" onclick="Runtime.navigate('blog')">Read news</button>
-            <button type="button" onclick="Runtime.navigate('forums')">Join discussions</button>
-            <button type="button" onclick="Runtime.navigate('calendar')">See events</button>
+      <section class="home-portal-hero">
+        <header class="page-header home-header">
+          <div class="home-hero-copy">
+            <span class="section-eyebrow">${escape(hero.kicker || "Community portal")}</span>
+            <h1 class="page-title">${escape(hero.title || "Welcome to our community hub")}</h1>
+            <p class="page-subtitle">${escape(hero.body || "Explore the latest articles, discussions, events, and community activities.")}</p>
           </div>
-        </div>
+          <div class="hero-actions">
+            <button class="button-primary" type="button" onclick="Runtime.navigate('blog')">Read news</button>
+            <button class="button-secondary" type="button" onclick="Runtime.navigate('forums')">Join discussions</button>
+            <button class="button-secondary" type="button" onclick="Runtime.navigate('calendar')">See events</button>
+          </div>
+        </header>
         ${renderHeroStats()}
         ${renderSpotlight()}
       </section>

@@ -119,7 +119,7 @@ test("brand and environment artwork exist", () => {
 });
 
 test("environment art swaps for ultrawide and auth surfaces", () => {
-  const css = read("assets/theme-glass-parity.css");
+  const css = read("assets/theme.css");
 
   assert.ok(
     css.includes('url("./brand/webby-night-ultrawide.svg")'),
@@ -133,6 +133,42 @@ test("environment art swaps for ultrawide and auth surfaces", () => {
     /@media \(min-width: 2200px\)/.test(css),
     "the ultrawide swap must be gated on a wide viewport"
   );
+});
+
+test("the theme is one stylesheet, with the glass parity rules folded in", () => {
+  const css = read("assets/theme.css");
+
+  for (const marker of [
+    ":root .module-empty-state,",
+    ":root .portal-empty-state {",
+    ":root .social-count,",
+    ":root .forum-index-panel {",
+    ":root .forum-index-row {",
+    ":root .forum-row-chevron {",
+    ":root .forum-tag {",
+    ":root .hero-actions {"
+  ]) {
+    assert.ok(css.includes(marker), `theme.css must own the folded glass parity rule ${marker}`);
+  }
+
+  // the folded selectors carry an extra :root ancestor so they keep winning the
+  // cascade without depending on loading after theme.css
+  assert.ok(
+    !/^\.forum-index-panel/m.test(css),
+    "glass parity selectors must carry the :root specificity prefix"
+  );
+
+  assert.ok(
+    !exists("assets/theme-glass-parity.css"),
+    "the parity sheet must be gone now that theme.css owns its rules"
+  );
+
+  for (const entry of ["index.html", "src/index.html"]) {
+    assert.ok(
+      !read(entry).includes("theme-glass-parity"),
+      `${entry} must not link the retired parity sheet`
+    );
+  }
 });
 
 test("both entrypoints load the theme, fonts and brand mark", () => {
