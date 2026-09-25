@@ -27,3 +27,8 @@ dist/
 
 # Local preview/run scratch state.
 .vly-run/
+
+# Isolation snapshot of the served site written by the run/preview host. It is
+# a copy of the app, not source, and committing it would duplicate the whole
+# runtime in the repository.
+isolate/

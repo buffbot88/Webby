@@ -4,7 +4,8 @@
     posts: [],
     filters: {
       query: "",
-      category: "All"
+      category: "All",
+      sort: "latest"
     },
     view: "browse",
     selectedThreadId: "",
@@ -33,6 +34,34 @@
     if (!iso) return "Unknown";
     const date = new Date(iso);
     return isNaN(date.getTime()) ? "Unknown" : date.toLocaleString();
+  }
+
+  /* Index rows show "2h ago" rather than a full timestamp, which is what the
+     discussion list is actually scanned for. */
+  function formatRelative(iso) {
+    if (!iso) return "-";
+    const date = new Date(iso);
+    if (isNaN(date.getTime())) return "-";
+
+    const delta = Date.now() - date.getTime();
+    if (delta < 60 * 1000) return "just now";
+
+    const minutes = Math.floor(delta / (60 * 1000));
+    if (minutes < 60) return `${minutes}m ago`;
+
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours}h ago`;
+
+    const days = Math.floor(hours / 24);
+    if (days < 7) return `${days}d ago`;
+
+    const weeks = Math.floor(days / 7);
+    if (weeks < 5) return `${weeks}w ago`;
+
+    const months = Math.floor(days / 30);
+    if (months < 12) return `${months}mo ago`;
+
+    return `${Math.floor(days / 365)}y ago`;
   }
 
   function setMessage(message, tone = "info") {
@@ -103,8 +132,17 @@
       .sort((a, b) => {
         const pinnedDelta = Number(b.metadata?.pinned === true) - Number(a.metadata?.pinned === true);
         if (pinnedDelta !== 0) return pinnedDelta;
+
         const aDate = new Date(a.metadata?.lastReplyAt || a.updatedAt || a.createdAt || 0).getTime();
         const bDate = new Date(b.metadata?.lastReplyAt || b.updatedAt || b.createdAt || 0).getTime();
+
+        if (state.filters.sort === "oldest") return aDate - bDate;
+
+        if (state.filters.sort === "popular") {
+          const replyDelta = getAllReplies(b.id).length - getAllReplies(a.id).length;
+          if (replyDelta !== 0) return replyDelta;
+        }
+
         return bDate - aDate;
       });
   }
@@ -371,38 +409,52 @@
     return `<div class="forum-thread-list forum-index-list">${threads.map(renderThreadPreview).join("")}</div>`;
   }
 
+  /* One index row: icon tile - title + excerpt - meta cluster. The reaction
+     bar and bookmark control live in the thread detail view so the list stays
+     scannable; the row shows read-only totals instead. */
   function renderThreadPreview(thread) {
     const replies = getVisibleReplies(thread.id);
+    const category = thread.metadata?.category || "General";
+    const tone = categoryTone(category);
     const lastActivity = thread.metadata?.lastReplyAt || thread.updatedAt || thread.createdAt;
     const excerpt = String(thread.body || "No description.").replace(/\s+/g, " ").trim();
+    const statusBadges = [
+      thread.metadata?.pinned ? `<span class="forum-badge forum-badge-pinned">Pinned</span>` : "",
+      thread.status === "closed" ? `<span class="forum-badge forum-badge-closed">Closed</span>` : ""
+    ].join("");
+
     return `
-      <article class="forum-thread-card forum-index-card">
-        <div class="forum-index-main">
-          <div class="forum-thread-topline">
-            <div>
-              <div class="section-eyebrow">${escape(thread.metadata?.category || "General")}</div>
-              <h2>
-                <button type="button" class="link-button" onclick="window.ForumModuleUI.openThread(${jsArg(thread.id)})">
-                  ${escape(thread.title || "Untitled thread")}
-                </button>
-              </h2>
-              <div class="forum-thread-meta">
-                ${renderAuthor(thread.authorId)}
-                <span>Started ${escape(formatDate(thread.createdAt))}</span>
-                <span>Last activity ${escape(formatDate(lastActivity))}</span>
-              </div>
-            </div>
-            <div class="forum-badge-row">${renderBadges(thread)}</div>
-          </div>
-          <p class="forum-index-excerpt">${escape(excerpt.length > 180 ? `${excerpt.slice(0, 177)}...` : excerpt)}</p>
-          ${renderThreadSocialBar(thread)}
+      <article class="forum-index-card forum-index-row">
+        <span class="forum-row-icon" data-tone="${escape(tone)}" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${categoryTileIcon(category)}</svg>
+        </span>
+
+        <div class="forum-row-main">
+          <h3 class="forum-row-title">
+            <button type="button" class="link-button" onclick="window.ForumModuleUI.openThread(${jsArg(thread.id)})">
+              ${escape(thread.title || "Untitled thread")}
+            </button>
+            ${statusBadges}
+          </h3>
+          <p class="forum-row-excerpt">${escape(excerpt.length > 180 ? `${excerpt.slice(0, 177)}...` : excerpt)}</p>
         </div>
-        <aside class="forum-index-stats" aria-label="Thread activity">
-          <strong>${escape(String(replies.length))}</strong>
-          <span>Replies</span>
-          <strong>${thread.metadata?.pinned ? "Pinned" : thread.status === "closed" ? "Closed" : "Open"}</strong>
-          <span>Status</span>
-        </aside>
+
+        <div class="forum-row-meta">
+          <span class="forum-tag" data-tone="${escape(tone)}">${escape(category)}</span>
+          <span class="forum-row-stat" title="${escape(String(replies.length))} replies">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ROW_ICONS.reply}</svg>
+            <span>${escape(String(replies.length))}</span>
+          </span>
+          <span class="forum-row-stat" data-tone="rose" data-reaction-total="${escape(String(thread.id))}" title="Reactions">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ROW_ICONS.heart}</svg>
+            <span>0</span>
+          </span>
+          <span class="forum-row-time" title="${escape(formatDate(lastActivity))}">${escape(formatRelative(lastActivity))}</span>
+          <span class="forum-row-chevron" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">${ROW_ICONS.chevron}</svg>
+          </span>
+        </div>
+
         ${renderThreadActionBar(thread)}
       </article>
     `;
@@ -461,6 +513,31 @@
   };
 
   const DEFAULT_CATEGORY_ICON = '<circle cx="12" cy="12" r="3"/><path d="M12 4.6V3M12 21v-1.6M4.6 12H3M21 12h-1.6M6.8 6.8 5.7 5.7M18.3 18.3l-1.1-1.1"/>';
+
+  /* Inline glyphs for the index-row meta cluster (stroke-only, inherit tone). */
+  const ROW_ICONS = {
+    reply: '<path d="M20 12.4c0 3.9-3.6 7-8 7-.9 0-1.8-.1-2.6-.4L4 21l1.3-3.4C4.5 16.4 4 14.5 4 12.4 4 8.5 7.6 5.4 12 5.4s8 3.1 8 7z"/>',
+    heart: '<path d="M12 19.4 5.3 13a4.2 4.2 0 0 1 5.9-5.9l.8.8.8-.8A4.2 4.2 0 0 1 18.7 13z"/>',
+    chevron: '<path d="M9 6l6 6-6 6"/>'
+  };
+
+  const SORT_OPTIONS = [
+    ["latest", "Latest"],
+    ["popular", "Most Replies"],
+    ["oldest", "Oldest"]
+  ];
+
+  /* Category identity comes from the icon and the pill tone, never from
+     tinting the whole row. */
+  function categoryTone(name) {
+    const meta = CATEGORY_META[name];
+    return meta?.tone || "cyan";
+  }
+
+  function categoryTileIcon(name) {
+    const meta = CATEGORY_META[name];
+    return meta?.icon || DEFAULT_CATEGORY_ICON;
+  }
 
   function categoryCounts() {
     const counts = new Map();
@@ -526,8 +603,18 @@
     return `
       <div id="forumThreadContainer">
         ${renderCategoryGrid()}
-        ${renderFilters()}
-        ${renderThreadList()}
+        <section class="forum-index-panel" aria-label="Recent discussions">
+          <header class="forum-panel-head">
+            <h2 class="panel-title">Recent Discussions</h2>
+            <label class="forum-sort">
+              <select id="forumSort" aria-label="Sort discussions" onchange="window.ForumModuleUI.updateSort()">
+                ${SORT_OPTIONS.map(([value, label]) => `<option value="${escape(value)}" ${state.filters.sort === value ? "selected" : ""}>${escape(label)}</option>`).join("")}
+              </select>
+            </label>
+          </header>
+          ${renderFilters()}
+          ${renderThreadList()}
+        </section>
       </div>
     `;
   }
@@ -613,7 +700,26 @@
     window.ReactionCoreSystem?.hydrateReactionBars?.();
     window.BookmarkCoreSystem?.hydrateBookmarkButtons?.();
     hydrateReputationBadges();
+    hydrateRowReactionCounts();
     refreshModerationReports();
+  }
+
+  /* Index rows render synchronously, so their reaction totals are filled in
+     afterwards. A failure leaves the row at 0 rather than blanking it. */
+  async function hydrateRowReactionCounts() {
+    const nodes = Array.from(document.querySelectorAll("[data-reaction-total]"));
+    await Promise.all(nodes.map(async (node) => {
+      const targetId = node.dataset.reactionTotal;
+      if (!targetId || !window.ReactionCoreSystem?.countReactionsByType) return;
+      try {
+        const counts = await window.ReactionCoreSystem.countReactionsByType("forumThread", targetId);
+        const total = Object.values(counts || {}).reduce((sum, value) => sum + (Number(value) || 0), 0);
+        const valueNode = node.querySelector("span");
+        if (valueNode) valueNode.textContent = String(total);
+      } catch (error) {
+        Diagnostics?.warn?.("[Forums] failed to hydrate row reaction count", { targetId, error: error?.message || String(error) });
+      }
+    }));
   }
 
   async function hydrateReputationBadges() {
@@ -663,11 +769,19 @@
     updateForumPage();
   }
 
+  function updateSort() {
+    const select = document.getElementById("forumSort");
+    const value = select?.value || "latest";
+    state.filters.sort = SORT_OPTIONS.some(([option]) => option === value) ? value : "latest";
+    updateForumPage();
+  }
+
   window.ForumModuleUI = {
     refresh: refreshForum,
     setView,
     openThread,
     setCategory,
+    updateSort,
 
     async createThread(event) {
       if (event && typeof event.preventDefault === "function") event.preventDefault();
@@ -1109,10 +1223,17 @@
         <section class="page-shell forum-shell">
           <header class="page-header forum-header">
             <div>
+              <span class="section-eyebrow">COMMUNITY</span>
               <h1 class="page-title">Forums</h1>
-              <p class="page-subtitle">Structured community discussions with threaded replies, reputation, moderation, and attachments.</p>
+              <p class="page-subtitle">Gather, discuss, and explore ideas from across Webby.</p>
             </div>
-            <button class="button-secondary" type="button" onclick="window.ForumModuleUI.refresh()">Refresh</button>
+            <div class="hero-actions">
+              <button class="button-primary" type="button" onclick="window.ForumModuleUI.setView('start')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+                New Thread
+              </button>
+              <button class="button-secondary" type="button" onclick="window.ForumModuleUI.refresh()">Refresh</button>
+            </div>
           </header>
 
           <div id="forumStatusMessage">${renderStatusMessage()}</div>

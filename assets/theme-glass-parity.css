@@ -56,3 +56,318 @@
 .calendar-event-ledger span {
   background: var(--glass-1);
 }
+
+/* =========================================================
+   PAGE HERO ACTIONS
+
+   The hero's right-hand slot ("+ New Thread") is a primary action,
+   not a filter control, so it gets the display-grade sizing from the
+   spec and keeps the gradient button's glow on hover only.
+========================================================= */
+
+.hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
+
+.hero-actions svg {
+  width: 18px;
+  height: 18px;
+}
+
+.hero-actions .button-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 46px;
+  padding: 0 22px;
+}
+
+/* =========================================================
+   FORUMS — RECENT DISCUSSIONS PANEL
+
+   One glass panel owns the heading, the tools and the rows, so the
+   discussion list reads as a single surface instead of a stack of
+   separate cards (spec section 10).
+========================================================= */
+
+.forum-index-panel {
+  border-radius: 20px;
+  border: 1px solid var(--border-glass);
+  background: var(--glass-2);
+  -webkit-backdrop-filter: blur(22px) saturate(125%);
+  backdrop-filter: blur(22px) saturate(125%);
+  box-shadow: var(--glass-reflection);
+  overflow: hidden;
+}
+
+.forum-panel-head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.forum-panel-head .panel-title {
+  flex: 1 1 auto;
+  margin: 0;
+}
+
+.forum-sort {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.forum-sort select {
+  appearance: none;
+  height: 38px;
+  padding: 0 36px 0 14px;
+  border-radius: 11px;
+  border: 1px solid var(--border-glass);
+  background: rgba(3, 15, 30, 0.52);
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.forum-sort::after {
+  content: "";
+  position: absolute;
+  right: 15px;
+  width: 7px;
+  height: 7px;
+  border-right: 1.6px solid var(--text-muted);
+  border-bottom: 1.6px solid var(--text-muted);
+  transform: rotate(45deg) translateY(-2px);
+  pointer-events: none;
+}
+
+/* the tools row reuses the panel surface instead of a second card */
+.forum-index-panel .search-tools {
+  margin: 0;
+  padding: 14px 22px;
+  border-bottom: 1px solid var(--hairline);
+  background: transparent;
+}
+
+.forum-index-panel .search-tools input,
+.forum-index-panel .search-tools select {
+  min-width: 200px;
+  height: 40px;
+  padding: 0 14px;
+  border-radius: 11px;
+  border: 1px solid rgba(140, 194, 255, 0.3);
+  background: rgba(3, 15, 30, 0.52);
+  color: var(--text-primary);
+  font-size: 13.5px;
+}
+
+/* the list keeps theme.css's hairline rows, only the container drops away */
+.forum-index-panel .forum-thread-list {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow: none;
+}
+
+/* =========================================================
+   FORUMS — INDEX ROWS
+
+   icon tile - title + excerpt - meta cluster (tag, counts, time).
+   Rows stay borderless; theme.css supplies the hairline separators.
+========================================================= */
+
+.forum-index-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: center;
+  min-height: 78px;
+  padding: 14px 22px;
+}
+
+.forum-row-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  border: 1px solid rgba(130, 192, 245, 0.22);
+  background: rgba(29, 76, 120, 0.25);
+  color: var(--cyan);
+}
+
+.forum-row-icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.forum-row-icon[data-tone="violet"] {
+  border-color: rgba(135, 116, 255, 0.34);
+  background: rgba(135, 116, 255, 0.16);
+  color: #b9adff;
+}
+
+.forum-row-icon[data-tone="gold"] {
+  border-color: rgba(225, 188, 114, 0.34);
+  background: rgba(225, 188, 114, 0.14);
+  color: var(--gold);
+}
+
+.forum-row-main {
+  min-width: 0;
+}
+
+.forum-row-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 15.5px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.forum-row-title .link-button {
+  padding: 0;
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+  font-size: 15.5px;
+  font-weight: 600;
+  text-align: left;
+}
+
+.forum-row-title .link-button:hover {
+  background: transparent;
+  color: var(--cyan);
+}
+
+.forum-row-excerpt {
+  margin: 5px 0 0;
+  color: var(--text-muted);
+  font-size: 13.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.forum-row-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.forum-row-stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 42px;
+}
+
+.forum-row-stat svg {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 auto;
+}
+
+.forum-row-stat[data-tone="rose"] {
+  color: var(--rose);
+}
+
+.forum-row-time {
+  min-width: 64px;
+  text-align: right;
+  font-weight: 500;
+}
+
+.forum-row-chevron {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  color: var(--text-muted);
+  transition: color 180ms ease, transform 180ms ease;
+}
+
+.forum-row-chevron svg {
+  width: 18px;
+  height: 18px;
+}
+
+.forum-index-row:hover .forum-row-chevron {
+  color: var(--cyan);
+  transform: translateX(2px);
+}
+
+/* moderation controls keep their own full-width row inside the card */
+.forum-index-row > .forum-action-bar {
+  grid-column: 1 / -1;
+  border-top: 0;
+  padding-top: 0;
+}
+
+/* compact category pills, toned per category (spec section 12) */
+.forum-tag {
+  min-height: 24px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(65, 165, 255, 0.55);
+  background: rgba(20, 109, 190, 0.2);
+  color: #83c9ff;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+.forum-tag[data-tone="violet"] {
+  border-color: rgba(135, 116, 255, 0.55);
+  background: rgba(101, 84, 214, 0.2);
+  color: #b9adff;
+}
+
+.forum-tag[data-tone="gold"] {
+  border-color: rgba(225, 188, 114, 0.6);
+  background: rgba(225, 188, 114, 0.16);
+  color: var(--gold);
+}
+
+/* responsive: collapse the metadata cluster before the rail does (spec 15) */
+@media (max-width: 900px) {
+  .forum-row-time {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .forum-index-row {
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 12px;
+    padding: 14px 16px;
+  }
+
+  .forum-row-meta {
+    grid-column: 2;
+    gap: 12px;
+    font-size: 12px;
+  }
+
+  .forum-row-chevron {
+    display: none;
+  }
+
+  .hero-actions {
+    margin-left: 0;
+  }
+}

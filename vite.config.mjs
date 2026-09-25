@@ -10,7 +10,7 @@ import { cpSync, existsSync, mkdirSync } from "node:fs";
 // The vanilla runtime fetches its scripts, styles, layouts, and config at
 // runtime, so the production build must ship those files as static assets
 // alongside the Vite bundle.
-const ROOT = path.resolve(__dirname);
+const ROOT = path.resolve(import.meta.dirname);
 const RUNTIME_ASSETS = [
   "assets",
   "Core",
