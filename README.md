@@ -1,4 +1,4 @@
-﻿# WebbyOS
+# WebbyOS
 
 WebbyOS is a modular self-hosted community ecosystem platform built with vanilla JavaScript and lightweight PHP persistence services.
 
@@ -192,6 +192,45 @@ These systems completed the v0.47 public UX productization phase and passed the 
 ```
 
 `index.html` now loads the migrated `Core/` implementations first. Legacy files under `assets/` and `modules/pages/` are retained for compatibility while the shim policy remains active.
+
+---
+
+# Design System — Midnight Glass Fantasy
+
+Webby's interface follows one rule: **content → glass UI → fantasy atmosphere**.
+The fantasy lives in a single background layer, the brand mark, and small
+ornaments; the application UI itself stays clean and functional.
+
+Structure (desktop):
+
+```text
+app-background (fixed art + dark wash + vignette)
+  `-- nav-rail (84px icon rail, tooltips, active cyan edge)
+  `-- app-main
+        |-- topbar (wordmark, search palette, notification + account)
+        `-- #layout-slot -> page-shell (max 1380px, 28/40/48 padding)
+```
+
+- **Tokens** live in `assets/theme.css` (`--bg-deep`, `--surface-glass`,
+  `--border-glass`, `--text-*`, `--blue/--cyan/--violet/--gold/--rose`,
+  `--glass-1|2|3`, `--font-display`, `--font-ui`). Legacy token names are
+  aliased, so every existing component inherits the theme.
+- **Glass strengths**: `.glass-subtle` (nav/header), `.glass` (cards/panels),
+  `.glass-strong` (modals/forms). Panels add an inset upper reflection.
+- **Typography**: `Cinzel` for page titles, section headings and the wordmark;
+  `Inter` for all interface text.
+- **Shell rendering**: `assets/layoutEngine.js` fills the `layouts/default.html`
+  slots (`rail`, `railLogo`, `brand`, `search`, `nav`, `route`, `main`). The
+  rail is built from registry/navigation items; the search palette filters them
+  and `Ctrl`/`Cmd` + `K` focuses it.
+- **Responsive**: rail becomes a sticky bottom navigation below 768px, where the
+  portrait background variant and collapsed thread metadata take over.
+- **Artwork** (`assets/brand/`): `webby-night.svg` (environment),
+  `webby-night-portrait.svg`, `webby-crystal.svg` (mark/favicon),
+  `webby-avatar.svg` (default avatar), `webby-empty.svg` (empty states).
+  Icons are inline SVG so they stay sharp and inherit theme colors.
+- **Tests**: `test/ui-shell.test.js` locks in the layout slots, shell markup,
+  theme tokens and brand assets (`npm test`).
 
 ---
 

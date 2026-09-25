@@ -147,7 +147,7 @@
 
   function renderEvent(event) {
     return `
-      <article class="calendar-event-card event-calendar-card">
+      <article class="calendar-event-card event-calendar-card glass">
         ${event.metadata?.imageUrl ? `<img class="cover-image" src="${escape(event.metadata.imageUrl)}" alt="${escape(event.title || "Event image")}" loading="lazy" />` : ""}
         <header>
           <div class="calendar-event-topline">
@@ -182,7 +182,12 @@
 
     const events = visibleEvents();
     if (!events.length) {
-      return `<div class="calendar-empty">No upcoming published events are available yet.</div>`;
+      return `
+        <div class="calendar-empty module-empty-state glass-subtle">
+          <strong>No upcoming events.</strong>
+          <p>Published events will appear here as they are scheduled.</p>
+        </div>
+      `;
     }
 
     return `<div class="calendar-event-list">${events.map(renderEvent).join("")}</div>`;
@@ -224,7 +229,7 @@
     }
 
     return `
-      <section class="calendar-month-panel">
+      <section class="calendar-month-panel glass">
         <header class="panel-header">
           <div>
             <h2>${escape(monthLabel(base))}</h2>
@@ -308,7 +313,7 @@
     const events = visibleEvents();
     if (!events.length) {
       return `
-        <div class="calendar-empty module-empty-state">
+        <div class="calendar-empty module-empty-state glass-subtle">
           <strong>No upcoming events.</strong>
           <p>Published events will appear here as a chronological agenda.</p>
         </div>
@@ -356,7 +361,7 @@
     }
 
     return `
-      <article class="calendar-editor">
+      <article class="calendar-editor glass">
         <h2>Create Event</h2>
         <form id="calendarEventForm" onsubmit="window.CalendarModuleUI.createEvent(event)">
           <div class="form-row">
@@ -742,7 +747,7 @@
       if (!contentSystem || !userSystem) {
         return `
           <section class="page-shell calendar-shell">
-            <h1>Calendar</h1>
+            <header class="page-header calendar-header"><div><span class="section-eyebrow">EVENTS</span><h1 class="page-title">Calendar</h1><p class="page-subtitle">Gatherings, dates, and community moments.</p></div></header>
             <div class="calendar-alert" data-tone="error">Calendar system is unavailable.</div>
           </section>
         `;
@@ -761,6 +766,7 @@
         <section class="page-shell calendar-shell">
           <header class="page-header calendar-header">
             <div>
+              <span class="section-eyebrow">EVENTS</span>
               <h1 class="page-title">Calendar</h1>
               <p class="page-subtitle">A real event calendar for published dates, featured events, locations, images, and community planning.</p>
             </div>

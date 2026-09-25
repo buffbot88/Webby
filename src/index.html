@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+     <title>WebbyOS</title>
+
+  <link rel="icon" href="/assets/brand/webby-crystal.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" />
+  <link rel="stylesheet" href="/assets/theme.css">
+  <link rel="stylesheet" href="/assets/theme-glass-parity.css">
+</head>
+
+<body>
+
+  <!-- =========================
+       APP ROOT
+  ========================== -->
+  <div id="app"></div>
+
+  <!-- =========================
+       OVERLAY + MODAL ROOTS
+  ========================== -->
+  <div id="overlayLayer"></div>
+  <div id="modalLayer"></div>
+
+  <!-- React entry: mounts the shell and loads the vanilla runtime scripts. -->
+  <script type="module" src="/main.jsx"></script>
+</body>
+
+</html>

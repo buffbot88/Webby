@@ -53,7 +53,7 @@
     return `
       <header class="home-section-header">
         <div>
-          <h3>${escape(title)}</h3>
+          <h3 class="panel-title">${escape(title)}</h3>
           ${subtitle ? `<p class="home-section-subtitle">${escape(subtitle)}</p>` : ""}
         </div>
         ${action}
@@ -72,7 +72,7 @@
 
   function renderPortalEmpty(title, body, route, actionLabel) {
     return `
-      <div class="portal-empty-state">
+      <div class="portal-empty-state glass-subtle">
         <strong>${escape(title)}</strong>
         <p>${escape(body)}</p>
         ${route ? `<button type="button" class="button-secondary" onclick="Runtime.navigate('${escape(route)}')">${escape(actionLabel || "Open")}</button>` : ""}
@@ -81,7 +81,7 @@
   }
 
   function renderFeedList(items, emptyTitle, emptyMessage, badgeLabel, linkPrefix) {
-    if (!state.loaded) return `<div class="portal-empty-state is-loading"><strong>Loading</strong><p>Collecting the latest public updates.</p></div>`;
+    if (!state.loaded) return `<div class="portal-empty-state is-loading glass-subtle"><strong>Loading</strong><p>Collecting the latest public updates.</p></div>`;
     if (!items.length) return renderPortalEmpty(emptyTitle, emptyMessage, linkPrefix.replace("#", ""), "Open section");
     return `
       <ul class="home-feed-list">
@@ -90,7 +90,7 @@
             const excerpt = excerptFrom(item);
             const href = `${linkPrefix}`;
             return `
-              <li class="home-feed-item">
+              <li class="home-feed-item glass-subtle">
                 <div class="home-feed-meta">
                   <span class="home-feed-badge">${escape(badgeLabel)}</span>
                   <time class="muted">${escape(formatDate(item.createdAt))}</time>
@@ -192,7 +192,7 @@
   }
 
   function renderEventSummary() {
-    if (!state.loaded) return `<div class="portal-empty-state is-loading"><strong>Loading</strong><p>Checking upcoming events.</p></div>`;
+    if (!state.loaded) return `<div class="portal-empty-state is-loading glass-subtle"><strong>Loading</strong><p>Checking upcoming events.</p></div>`;
     if (!state.events.length) {
       return renderPortalEmpty(
         "No events scheduled",
@@ -208,7 +208,7 @@
             const eventDate = formatDate(event.metadata?.eventDate || event.createdAt);
             const location = typeof event.metadata?.location === "string" ? event.metadata.location : "";
             return `
-              <li class="home-feed-item">
+              <li class="home-feed-item glass-subtle">
                 <div class="home-feed-meta">
                   <span class="home-feed-badge">Event</span>
                   <time class="muted">${escape(eventDate)}</time>
@@ -224,7 +224,7 @@
   }
 
   function renderActivitySummary() {
-    if (!state.loaded) return `<div class="portal-empty-state is-loading"><strong>Loading</strong><p>Preparing recent community activity.</p></div>`;
+    if (!state.loaded) return `<div class="portal-empty-state is-loading glass-subtle"><strong>Loading</strong><p>Preparing recent community activity.</p></div>`;
     if (window.ActivityFeedCoreSystem?.renderActivityFeed) {
       if (!state.activities.length) {
         return renderPortalEmpty("No activity yet", "New posts, replies, events, and social actions will collect here.", "", "");
@@ -235,7 +235,7 @@
   }
 
   function renderTrendingSummary() {
-    if (!state.loaded) return `<div class="portal-empty-state is-loading"><strong>Loading</strong><p>Looking for featured public content.</p></div>`;
+    if (!state.loaded) return `<div class="portal-empty-state is-loading glass-subtle"><strong>Loading</strong><p>Looking for featured public content.</p></div>`;
     if (window.SearchCoreSystem?.renderResults) {
       if (!state.trending.length) {
         return renderPortalEmpty("No featured content yet", "Featured and frequently updated items will appear here.", "", "");
@@ -256,7 +256,7 @@
     ].filter(Boolean);
 
     if (!state.loaded) {
-      return `<div class="home-spotlight-grid">${[1, 2, 3].map(() => `<div class="home-spotlight-card portal-empty-state is-loading"><strong>Loading</strong><p>Preparing portal highlights.</p></div>`).join("")}</div>`;
+      return `<div class="home-spotlight-grid">${[1, 2, 3].map(() => `<div class="home-spotlight-card portal-empty-state is-loading glass"><strong>Loading</strong><p>Preparing portal highlights.</p></div>`).join("")}</div>`;
     }
 
     if (!spotlightItems.length) {
@@ -267,7 +267,7 @@
             ["Discussions", "Start forum threads and replies for community conversation.", "forums"],
             ["Events", "Schedule public events with dates, locations, and images.", "calendar"]
           ].map(([label, body, route]) => `
-            <button type="button" class="home-spotlight-card" onclick="Runtime.navigate('${escape(route)}')">
+            <button type="button" class="home-spotlight-card glass" onclick="Runtime.navigate('${escape(route)}')">
               <span>${escape(label)}</span>
               <strong>${escape(body)}</strong>
             </button>
@@ -279,7 +279,7 @@
     return `
       <div class="home-spotlight-grid">
         ${spotlightItems.map(([label, title, body, route]) => `
-          <button type="button" class="home-spotlight-card" onclick="Runtime.navigate('${escape(route)}')">
+          <button type="button" class="home-spotlight-card glass" onclick="Runtime.navigate('${escape(route)}')">
             <span>${escape(label)}</span>
             <strong>${escape(title)}</strong>
             ${body ? `<small>${escape(body)}</small>` : ""}
@@ -300,7 +300,7 @@
       <div class="home-hero-stats" aria-label="Community overview">
         ${stats
           .map(([label, count]) => `
-            <div class="home-hero-stat">
+            <div class="home-hero-stat glass">
               <strong>${escape(String(count))}</strong>
               <span>${escape(label)}</span>
             </div>
@@ -313,11 +313,11 @@
   function renderHero() {
     const hero = builderConfig().hero || {};
     return `
-      <section class="home-portal-hero cms-hero">
+      <section class="home-portal-hero panel">
         <div class="home-hero-copy">
-          <div class="cms-kicker">${escape(hero.kicker || "Community portal")}</div>
-          <h1>${escape(hero.title || "Welcome to our community hub")}</h1>
-          <p>${escape(hero.body || "Explore the latest articles, discussions, events, and community activities.")}</p>
+          <div class="section-eyebrow">${escape(hero.kicker || "Community portal")}</div>
+          <h1 class="page-title">${escape(hero.title || "Welcome to our community hub")}</h1>
+          <p class="page-subtitle">${escape(hero.body || "Explore the latest articles, discussions, events, and community activities.")}</p>
           <div class="home-hero-actions">
             <button type="button" class="primary" onclick="Runtime.navigate('blog')">Read news</button>
             <button type="button" onclick="Runtime.navigate('forums')">Join discussions</button>
@@ -346,7 +346,7 @@
     return `
       <div class="home-quicknav-grid">
         ${items.map(([route, label, description]) => `
-          <button type="button" class="home-quicknav-card" onclick="Runtime.navigate('${escape(route)}')">
+          <button type="button" class="home-quicknav-card glass" onclick="Runtime.navigate('${escape(route)}')">
             <span class="home-quicknav-label">${escape(label)}</span>
             <span class="home-quicknav-copy">${escape(description)}</span>
           </button>

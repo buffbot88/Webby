@@ -1,19 +1,41 @@
-<div class="layout layout-default">
+<div class="app-shell" data-route="{{slot:route}}">
 
-  <header class="system-header">
+  <div class="app-background" aria-hidden="true">
+    <div class="app-background-art"></div>
+    <div class="app-background-stars"></div>
+  </div>
 
-    <div class="system-brand">
-      {{slot:brand}}
-    </div>
+  <nav class="nav-rail" aria-label="Primary">
+    <div class="rail-logo">{{slot:railLogo}}</div>
+    <div class="rail-items">{{slot:rail}}</div>
+  </nav>
 
-    <nav class="system-actions">
-      {{slot:nav}}
-    </nav>
+  <div class="app-main">
 
-  </header>
+    <header class="topbar">
 
-  <main id="layout-slot">
-    {{slot:main}}
-  </main>
+      <div class="topbar-brand">
+        {{slot:brand}}
+      </div>
+
+      <div class="topbar-search">
+        {{slot:search}}
+      </div>
+
+      <div class="topbar-actions">
+        {{slot:nav}}
+      </div>
+
+    </header>
+
+    <main id="layout-slot">
+      {{slot:main}}
+    </main>
+
+  </div>
+
+  <nav class="bottom-nav" aria-label="Primary mobile">
+    {{slot:rail}}
+  </nav>
 
 </div>

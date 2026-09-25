@@ -361,7 +361,7 @@
     const threads = getVisibleThreads();
     if (!threads.length) {
       return `
-        <div class="forum-empty module-empty-state">
+        <div class="forum-empty module-empty-state glass-subtle">
           <strong>No public threads yet.</strong>
           <p>Forum discussions will appear here with categories, reply counts, and last activity.</p>
         </div>
@@ -442,12 +442,77 @@
     `;
   }
 
+  const CATEGORY_META = {
+    General: {
+      tone: "cyan",
+      description: "Open discussions and community chat.",
+      icon: '<path d="M20 12.4c0 3.9-3.6 7-8 7-.9 0-1.8-.1-2.6-.4L4 21l1.3-3.4C4.5 16.4 4 14.5 4 12.4 4 8.5 7.6 5.4 12 5.4s8 3.1 8 7z"/>'
+    },
+    Development: {
+      tone: "violet",
+      description: "Projects, ideas, and technical discussions.",
+      icon: '<path d="M14.8 6.2a3.6 3.6 0 0 1 4.9 4.6l-1.9-1.9-2.3.6-.6 2.3 1.9 1.9A3.6 3.6 0 0 1 12.9 9"/><path d="M12.9 9 5.4 16.5a1.4 1.4 0 1 0 2 2L14.8 11"/>'
+    },
+    Showcase: {
+      tone: "gold",
+      description: "Show your work and creations.",
+      icon: '<path d="M12 4.2a7.8 7.8 0 0 0 0 15.6c1.3 0 2-.9 2-1.9 0-1.4-1.2-1.6-1.2-2.6 0-.8.7-1.4 1.5-1.4h1.4a4.1 4.1 0 0 0 4.1-4.2c0-3.2-3.5-5.5-7.8-5.5z"/><circle cx="8.6" cy="10" r="1"/><circle cx="11.6" cy="7.6" r="1"/><circle cx="15.4" cy="9" r="1"/>'
+    }
+  };
+
+  const DEFAULT_CATEGORY_ICON = '<circle cx="12" cy="12" r="3"/><path d="M12 4.6V3M12 21v-1.6M4.6 12H3M21 12h-1.6M6.8 6.8 5.7 5.7M18.3 18.3l-1.1-1.1"/>';
+
+  function categoryCounts() {
+    const counts = new Map();
+    state.threads
+      .filter((thread) => thread.status !== "trash")
+      .forEach((thread) => {
+        const name = thread.metadata?.category || "General";
+        counts.set(name, (counts.get(name) || 0) + 1);
+      });
+    return counts;
+  }
+
+  function categoryCards() {
+    const counts = categoryCounts();
+    const canonical = Object.keys(CATEGORY_META);
+    const extra = Array.from(counts.keys()).filter((name) => !canonical.includes(name));
+    const ranked = [...canonical, ...extra].sort((a, b) => (counts.get(b) || 0) - (counts.get(a) || 0));
+
+    return ranked.slice(0, 3).map((name) => {
+      const meta = CATEGORY_META[name] || { tone: "cyan", description: "Community discussions.", icon: DEFAULT_CATEGORY_ICON };
+      const active = state.filters.category === name;
+
+      return `
+        <button type="button" class="forum-category-card${active ? " is-active" : ""}" data-tone="${escape(meta.tone)}"
+                aria-pressed="${active ? "true" : "false"}"
+                onclick="window.ForumModuleUI.setCategory(${jsArg(name)})">
+          <span class="forum-category-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${meta.icon}</svg>
+          </span>
+          <span class="forum-category-copy">
+            <span class="forum-category-name">${escape(name)}</span>
+            <span class="forum-category-desc">${escape(meta.description)}</span>
+            <span class="forum-category-count">${counts.get(name) || 0} threads</span>
+          </span>
+          <span class="forum-category-chevron" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg>
+          </span>
+        </button>
+      `;
+    }).join("");
+  }
+
+  function renderCategoryGrid() {
+    return `<div class="forum-category-grid" aria-label="Forum categories">${categoryCards()}</div>`;
+  }
+
   function renderActiveView() {
     if (state.view === "thread") {
       const thread = findThread(state.selectedThreadId);
       return thread
         ? `<div id="forumThreadContainer">${renderThread(thread)}</div>`
-        : `<div class="forum-empty module-empty-state"><strong>Thread not found.</strong><p>The selected discussion is unavailable.</p></div>`;
+        : `<div class="forum-empty module-empty-state glass-subtle"><strong>Thread not found.</strong><p>The selected discussion is unavailable.</p></div>`;
     }
 
     if (state.view === "start") {
@@ -460,6 +525,7 @@
 
     return `
       <div id="forumThreadContainer">
+        ${renderCategoryGrid()}
         ${renderFilters()}
         ${renderThreadList()}
       </div>
@@ -585,10 +651,23 @@
     return state.posts.find((item) => String(item.id) === String(postId)) || null;
   }
 
+  function setCategory(category) {
+    const next = typeof category === "string" && category.trim() ? category.trim() : "All";
+    state.filters.category = state.filters.category === next ? "All" : next;
+
+    const select = document.getElementById("forumCategoryFilter");
+    if (select) {
+      select.value = state.filters.category;
+    }
+
+    updateForumPage();
+  }
+
   window.ForumModuleUI = {
     refresh: refreshForum,
     setView,
     openThread,
+    setCategory,
 
     async createThread(event) {
       if (event && typeof event.preventDefault === "function") event.preventDefault();

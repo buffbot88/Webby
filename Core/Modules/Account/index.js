@@ -330,22 +330,22 @@ ModuleSDK.registerPage("account", {
     function renderAccountOverview() {
       return `
         <section class="account-overview-grid" aria-label="Account summary">
-          <div class="account-overview-card">
+          <div class="account-overview-card glass">
             <span>Profile</span>
             <strong>${escape(displayName)}</strong>
             <small>@${escape(username)}</small>
           </div>
-          <div class="account-overview-card">
+          <div class="account-overview-card glass">
             <span>Role</span>
             <strong>${escape(role)}</strong>
             <small>${adminReady ? "Admin controls available" : "Standard workspace access"}</small>
           </div>
-          <div class="account-overview-card">
+          <div class="account-overview-card glass">
             <span>Notifications</span>
             <strong id="accountUnreadCount">0</strong>
             <small>Unread public activity</small>
           </div>
-          <div class="account-overview-card">
+          <div class="account-overview-card glass">
             <span>Messages</span>
             <strong id="accountMessageUnreadCount">0</strong>
             <small>Unread inbox items</small>
@@ -357,7 +357,13 @@ ModuleSDK.registerPage("account", {
     if (!userSystem) {
       return `
         <section class="page-shell account-shell">
-          <h1>Account</h1>
+          <header class="page-header account-heading">
+            <div>
+              <span class="section-eyebrow">ACCOUNT</span>
+              <h1 class="page-title">Account</h1>
+              <p class="page-subtitle">Identity, permissions, and community standing.</p>
+            </div>
+          </header>
           <div class="account-alert">Identity system is not available.</div>
         </section>
       `;
@@ -368,6 +374,7 @@ ModuleSDK.registerPage("account", {
         <section class="page-shell account-shell">
           <div class="page-header account-heading">
             <div>
+              <span class="section-eyebrow">ACCOUNT</span>
               <h1 class="page-title">Account</h1>
               <p class="page-subtitle">Sign in or create a community profile with identity, messages, bookmarks, reputation, and standing.</p>
             </div>
@@ -438,7 +445,7 @@ ModuleSDK.registerPage("account", {
 
     function renderProfileView() {
       return `
-        <div class="profile-card">
+        <div class="profile-card glass">
           <div class="profile-card-main">
             ${currentUser?.avatar
               ? `<img class="profile-avatar avatar-image" src="${escape(currentUser.avatar)}" alt="${escape(displayName)}" />`
@@ -590,6 +597,7 @@ ModuleSDK.registerPage("account", {
       <section class="page-shell account-shell">
         <div class="page-header account-heading">
           <div>
+            <span class="section-eyebrow">ACCOUNT</span>
             <h1 class="page-title">Account</h1>
             <p class="page-subtitle">A social profile hub for identity, permissions, notifications, bookmarks, inbox, reputation, and moderation standing.</p>
           </div>

@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 2560" width="1440" height="2560" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Midnight fantasy valley, portrait">
+  <defs>
+    <linearGradient id="pSky" x1="0" y1="0" x2="0" y2="2560" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#030914"/>
+      <stop offset="0.3" stop-color="#061630"/>
+      <stop offset="0.44" stop-color="#0C2E52"/>
+      <stop offset="0.5" stop-color="#071B33"/>
+      <stop offset="1" stop-color="#030A15"/>
+    </linearGradient>
+    <radialGradient id="pGlow" cx="960" cy="1080" r="700" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#4EA8FF" stop-opacity="0.24"/>
+      <stop offset="1" stop-color="#030914" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="pMoonGlow" cx="420" cy="420" r="300" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#DCEBFF" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#030914" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="pVignette" x1="0" y1="0" x2="0" y2="2560" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#02080F" stop-opacity="0.5"/>
+      <stop offset="0.3" stop-color="#02080F" stop-opacity="0"/>
+      <stop offset="1" stop-color="#02070D" stop-opacity="0.92"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1440" height="2560" fill="url(#pSky)"/>
+  <rect width="1440" height="2560" fill="url(#pGlow)"/>
+
+  <g fill="#EAF3FF">
+    <g opacity="0.8">
+      <circle cx="140" cy="200" r="2.4"/><circle cx="330" cy="330" r="1.8"/><circle cx="560" cy="140" r="2.2"/>
+      <circle cx="760" cy="420" r="1.7"/><circle cx="980" cy="220" r="2.4"/><circle cx="1180" cy="480" r="1.8"/>
+      <circle cx="1300" cy="180" r="2.1"/><circle cx="220" cy="640" r="1.7"/><circle cx="620" cy="720" r="2"/>
+      <circle cx="1120" cy="760" r="1.8"/><circle cx="880" cy="620" r="1.6"/><circle cx="1350" cy="820" r="1.9"/>
+    </g>
+    <g opacity="0.4">
+      <circle cx="260" cy="480" r="1.5"/><circle cx="470" cy="560" r="1.4"/><circle cx="700" cy="880" r="1.6"/>
+      <circle cx="1040" cy="980" r="1.4"/><circle cx="1260" cy="640" r="1.5"/><circle cx="180" cy="900" r="1.4"/>
+    </g>
+  </g>
+
+  <circle cx="420" cy="420" r="300" fill="url(#pMoonGlow)"/>
+  <circle cx="420" cy="420" r="96" fill="#DCEBFF" opacity="0.92"/>
+
+  <!-- distant castle, small and far -->
+  <g>
+    <path d="M700 1330 L900 1240 L1080 1300 L1200 1210 L1320 1290 L1440 1240 L1440 1400 L700 1400 Z" fill="#0A1F38"/>
+    <path d="M980 1264 L1000 1122 L1020 1264 Z" fill="#0D2743"/>
+    <path d="M1120 1268 L1146 1104 L1172 1268 Z" fill="#0D2743"/>
+    <path d="M1240 1284 L1262 1148 L1284 1284 Z" fill="#0A1F38"/>
+    <g fill="#E1BC72" opacity="0.6">
+      <rect x="1002" y="1204" width="7" height="12"/><rect x="1148" y="1180" width="7" height="12"/>
+      <rect x="1264" y="1214" width="7" height="12"/>
+    </g>
+  </g>
+
+  <!-- layered ridges, lots of dark negative space below -->
+  <path d="M0 1500 L200 1420 L420 1500 L640 1430 L880 1510 L1120 1440 L1360 1516 L1440 1470 L1440 1660 L0 1660 Z" fill="#0C2440" opacity="0.92"/>
+  <path d="M0 1680 L240 1600 L500 1684 L760 1610 L1020 1690 L1280 1620 L1440 1676 L1440 1900 L0 1900 Z" fill="#071829"/>
+  <rect x="0" y="1880" width="1440" height="680" fill="#050F1C" opacity="0.9"/>
+  <rect width="1440" height="2560" fill="url(#pVignette)"/>
+</svg>

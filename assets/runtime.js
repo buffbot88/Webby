@@ -856,7 +856,7 @@ const Runtime = window.Runtime || (() => {
     try {
       const layout = await LayoutEngine.load(route.layout || "default");
       const moduleHTML = ModuleLoader.load(route, { state });
-      const finalHTML = LayoutEngine.inject(layout, moduleHTML);
+      const finalHTML = LayoutEngine.inject(layout, moduleHTML, { route: route.id });
 
       if (navToken !== navigationSequence) {
         Diagnostics.info("[Runtime] discarded stale navigation render", {

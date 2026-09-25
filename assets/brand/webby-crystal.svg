@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024" role="img" aria-label="Webby crystal">
+  <defs>
+    <linearGradient id="crystalBody" x1="512" y1="96" x2="512" y2="928" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#EAF6FF"/>
+      <stop offset="0.42" stop-color="#8FD2FF"/>
+      <stop offset="0.78" stop-color="#4A8DE0"/>
+      <stop offset="1" stop-color="#3B3C97"/>
+    </linearGradient>
+    <linearGradient id="crystalEdge" x1="256" y1="256" x2="768" y2="768" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#55DCFF"/>
+      <stop offset="0.55" stop-color="#8774FF"/>
+      <stop offset="1" stop-color="#E1BC72"/>
+    </linearGradient>
+    <radialGradient id="halo" cx="512" cy="512" r="420" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#55DCFF" stop-opacity="0.42"/>
+      <stop offset="0.55" stop-color="#48A9FF" stop-opacity="0.12"/>
+      <stop offset="1" stop-color="#030914" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="soft" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="18"/>
+    </filter>
+  </defs>
+
+  <circle cx="512" cy="512" r="420" fill="url(#halo)"/>
+
+  <g filter="url(#soft)" opacity="0.7">
+    <path d="M512 120 L640 512 L512 904 L384 512 Z" fill="#55DCFF" opacity="0.35"/>
+  </g>
+
+  <!-- vertical crystal: a four-point star blade -->
+  <path d="M512 96 L584 440 L512 928 L440 440 Z" fill="url(#crystalBody)" opacity="0.95"/>
+  <path d="M512 96 L584 440 L512 928 Z" fill="#ffffff" opacity="0.10"/>
+
+  <!-- horizontal crystal -->
+  <path d="M96 512 L440 440 L928 512 L440 584 Z" fill="url(#crystalBody)" opacity="0.72"/>
+
+  <!-- sparkle accents -->
+  <path d="M512 96 L584 440 L512 928 L440 440 Z" fill="none" stroke="url(#crystalEdge)" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M216 250 L246 316 L312 346 L246 376 L216 442 L186 376 L120 346 L186 316 Z" fill="#EAF6FF" opacity="0.85"/>
+  <path d="M800 640 L822 690 L872 712 L822 734 L800 784 L778 734 L728 712 L778 690 Z" fill="#E1BC72" opacity="0.8"/>
+  <circle cx="756" cy="252" r="10" fill="#EEF5FF" opacity="0.9"/>
+  <circle cx="268" cy="770" r="7" fill="#55DCFF" opacity="0.75"/>
+</svg>

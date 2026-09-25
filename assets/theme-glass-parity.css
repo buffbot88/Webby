@@ -1,0 +1,58 @@
+/* =========================================================
+   GLASS PARITY — remaining legacy light surfaces
+=========================================================
+
+   theme.css's GLASS SYSTEM block migrated the main cards (panels,
+   auth cards, blog posts, forum threads, calendar events, overview
+   cards), but a set of placeholder, upload and dashboard-tile
+   surfaces kept the pre-Midnight-Glass near-white fills, so they
+   rendered as light boxes on the dark theme.
+
+   This sheet is loaded after theme.css and routes them through the
+   same glass tokens. The rules mirror theme.css's GLASS SYSTEM block
+   and belong there; they live in a separate sheet because theme.css
+   was carrying a large uncommitted redesign and could not be
+   rewritten safely.
+*/
+
+/* Placeholder / empty / upload surfaces.
+   These keep a dashed border so they still read as "nothing here yet". */
+.forum-empty,
+.blog-empty,
+.calendar-empty,
+.media-empty,
+.media-alert,
+.media-upload,
+.search-empty,
+.taxonomy-empty,
+.builder-empty,
+.module-empty-state,
+.portal-empty-state {
+  background: var(--glass-1);
+  -webkit-backdrop-filter: blur(16px) saturate(120%);
+  backdrop-filter: blur(16px) saturate(120%);
+  border: 1px dashed rgba(135, 192, 255, 0.28);
+  box-shadow: var(--glass-reflection);
+}
+
+/* Dashboard tiles that were painting a near-white surface. */
+.home-hero-stat,
+.home-spotlight-card,
+.home-quicknav-card {
+  background: var(--glass-2);
+  -webkit-backdrop-filter: blur(22px) saturate(125%);
+  backdrop-filter: blur(22px) saturate(125%);
+  border: 1px solid var(--border-glass);
+  box-shadow: var(--glass-reflection);
+}
+
+/* Same migration leftover, different symptom: these two kept a legacy
+   light-theme tint (slate-900 at 4-8%), which on the dark theme is not a
+   light box but no fill at all, leaving the count pill and the ledger
+   chips looking like bare text. */
+.social-count,
+.forum-thread-ledger span,
+.blog-editorial-ledger span,
+.calendar-event-ledger span {
+  background: var(--glass-1);
+}

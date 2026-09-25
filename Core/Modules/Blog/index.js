@@ -171,7 +171,7 @@
   function renderPost(post, featured = false) {
     const publishedDate = post.metadata?.publishedAt || post.createdAt;
     return `
-      <article class="blog-post-card editorial-post-card ${featured ? "editorial-featured-card" : ""}">
+      <article class="blog-post-card editorial-post-card glass ${featured ? "editorial-featured-card" : ""}">
         ${renderCover(post, !featured)}
         <header>
           <div class="blog-post-topline">
@@ -204,13 +204,13 @@
 
   function renderPostList() {
     if (state.loading && !state.loaded) {
-      return `<div class="blog-empty">Loading blog posts...</div>`;
+      return `<div class="blog-empty glass-subtle">Loading blog posts...</div>`;
     }
 
     const posts = visiblePosts();
     if (!posts.length) {
       return `
-        <div class="blog-empty module-empty-state">
+        <div class="blog-empty module-empty-state glass-subtle">
           <strong>No articles published yet.</strong>
           <p>Drafts and published posts will appear here with editorial metadata, tags, and cover media.</p>
         </div>
@@ -278,11 +278,11 @@
 
   function renderEditor() {
     if (!can("blog.post.create")) {
-      return `<div class="blog-empty">Sign in with publishing permissions to create blog posts.</div>`;
+      return `<div class="blog-empty glass-subtle">Sign in with publishing permissions to create blog posts.</div>`;
     }
 
     return `
-      <article class="blog-editor">
+      <article class="blog-editor glass">
         <h2>Create Blog Post</h2>
         <form id="blogCreateForm" onsubmit="window.BlogModuleUI.createPost(event)">
           <div class="form-row">
@@ -676,7 +676,7 @@
       if (!contentSystem || !userSystem) {
         return `
           <section class="page-shell blog-shell">
-            <h1>Blog</h1>
+            <header class="page-header blog-header"><div><span class="section-eyebrow">JOURNAL</span><h1 class="page-title">Blog</h1><p class="page-subtitle">Stories, updates, and ideas from the Webby community.</p></div></header>
             <div class="blog-alert" data-tone="error">Blog system is unavailable.</div>
           </section>
         `;
@@ -695,6 +695,7 @@
         <section class="page-shell blog-shell">
           <header class="page-header blog-header">
             <div>
+              <span class="section-eyebrow">JOURNAL</span>
               <h1 class="page-title">Blog</h1>
               <p class="page-subtitle">Editorial publishing with drafts, schedules, cover images, authors, categories, and tags.</p>
             </div>

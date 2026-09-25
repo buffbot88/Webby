@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 220" width="320" height="220" role="img" aria-label="Nothing here yet">
+  <defs>
+    <linearGradient id="esCrystal" x1="160" y1="30" x2="160" y2="170" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#EAF6FF"/>
+      <stop offset="0.55" stop-color="#8FD2FF"/>
+      <stop offset="1" stop-color="#8774FF"/>
+    </linearGradient>
+    <radialGradient id="esGlow" cx="160" cy="110" r="110" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#55DCFF" stop-opacity="0.36"/>
+      <stop offset="1" stop-color="#55DCFF" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <ellipse cx="160" cy="110" rx="120" ry="90" fill="url(#esGlow)"/>
+  <path d="M160 32 L184 96 L160 176 L136 96 Z" fill="url(#esCrystal)" opacity="0.92"/>
+  <path d="M62 104 L136 96 L272 108 L136 118 Z" fill="url(#esCrystal)" opacity="0.38"/>
+  <path d="M58 168 Q160 186 262 166" fill="none" stroke="#55DCFF" stroke-opacity="0.4" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="244" cy="62" r="4" fill="#EEF5FF" opacity="0.85"/>
+  <circle cx="78" cy="54" r="3" fill="#E1BC72" opacity="0.75"/>
+</svg>

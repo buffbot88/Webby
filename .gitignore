@@ -20,3 +20,10 @@ database/.storage-secret
 
 # Installed dependencies, if any are ever added.
 node_modules/
+
+# Production build output. Hosting runs the configured build command
+# (`vite build`) in a clean checkout, so this is generated, not source.
+dist/
+
+# Local preview/run scratch state.
+.vly-run/
