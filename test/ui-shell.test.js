@@ -3,10 +3,7 @@
 /**
  * Shell + theme contract tests.
  *
- * These lock in the Midnight Glass Fantasy shell: the layout template, the
- * slots LayoutEngine knows how to fill, the theme tokens, and the brand art.
- * They run with no dependencies (node:test only) so the design system cannot
- * silently regress into unresolved slots or a missing background layer.
+ * Run with no dependencies (node:test only); lock in the layout slots, theme tokens, brand art, and entrypoint wiring so the shell cannot silently regress.
  */
 
 const test = require("node:test");
@@ -113,10 +110,29 @@ test("brand and environment artwork exist", () => {
     "assets/brand/webby-avatar.svg",
     "assets/brand/webby-empty.svg",
     "assets/brand/webby-night.svg",
-    "assets/brand/webby-night-portrait.svg"
+    "assets/brand/webby-night-portrait.svg",
+    "assets/brand/webby-night-ultrawide.svg",
+    "assets/brand/webby-auth.svg"
   ]) {
     assert.ok(exists(asset), `missing artwork ${asset}`);
   }
+});
+
+test("environment art swaps for ultrawide and auth surfaces", () => {
+  const css = read("assets/theme-glass-parity.css");
+
+  assert.ok(
+    css.includes('url("./brand/webby-night-ultrawide.svg")'),
+    "ultrawide displays must get the natively authored wide scene"
+  );
+  assert.ok(
+    css.includes('url("./brand/webby-auth.svg")'),
+    "authentication surfaces must get the alternate composition"
+  );
+  assert.ok(
+    /@media \(min-width: 2200px\)/.test(css),
+    "the ultrawide swap must be gated on a wide viewport"
+  );
 });
 
 test("both entrypoints load the theme, fonts and brand mark", () => {
@@ -127,4 +143,35 @@ test("both entrypoints load the theme, fonts and brand mark", () => {
     assert.ok(html.includes("webby-crystal.svg"), `${entry} must use the Webby mark as favicon`);
     assert.ok(/assets\/theme\.css/.test(html), `${entry} must load the theme stylesheet`);
   }
+});
+
+test("both entrypoints load the same runtime scripts", () => {
+  const classic = [...read("index.html").matchAll(/src="\.\/([^"]+)"/g)].map((m) => m[1]).sort();
+  const vite = [...read("src/main.jsx").matchAll(/"([A-Za-z][^"]*\.js)"/g)].map((m) => m[1]).sort();
+
+  assert.ok(classic.length && vite.length, "both entrypoints must declare runtime scripts");
+  assert.deepEqual(
+    classic.filter((src) => !vite.includes(src)),
+    [],
+    "scripts the classic entrypoint loads but the Vite entrypoint skips"
+  );
+  assert.deepEqual(
+    vite.filter((src) => !classic.includes(src)),
+    [],
+    "scripts the Vite entrypoint loads but the classic entrypoint skips"
+  );
+});
+
+test("the live runtime hands the active route to the shell", () => {
+  const runtime = read("Core/Runtime/index.js");
+  const engine = read("assets/layoutEngine.js");
+
+  assert.ok(
+    /LayoutEngine\.inject\(layout, moduleHTML, \{\s*route:\s*route\.id\s*\}\)/.test(runtime),
+    "Core/Runtime must pass { route } or the rail never marks the active item"
+  );
+  assert.ok(
+    engine.includes("context.route"),
+    "LayoutEngine.inject must read the route from its context"
+  );
 });

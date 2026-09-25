@@ -4,12 +4,7 @@ import path from "node:path";
 import { cpSync, existsSync, mkdirSync } from "node:fs";
 
 // WebbyOS is a vanilla-JS app wrapped in a Vite + React shell for hosting.
-// The React entry mounts a shell component and then boots the existing
-// vanilla runtime (Core/*, assets/*, modules/*) exactly as index.html did.
-//
-// The vanilla runtime fetches its scripts, styles, layouts, and config at
-// runtime, so the production build must ship those files as static assets
-// alongside the Vite bundle.
+// Its runtime fetches scripts, styles, layouts, and config at load time, so the production build ships those files as static assets alongside the bundle.
 const ROOT = path.resolve(import.meta.dirname);
 const RUNTIME_ASSETS = [
   "assets",

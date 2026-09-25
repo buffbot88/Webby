@@ -1,0 +1,10 @@
+# Deny all direct access to the encrypted stores and the storage secret.
+# Apache 2.4 uses mod_authz_core; the fallback covers Apache 2.2.
+<IfModule mod_authz_core.c>
+  Require all denied
+</IfModule>
+
+<IfModule !mod_authz_core.c>
+  Order allow,deny
+  Deny from all
+</IfModule>

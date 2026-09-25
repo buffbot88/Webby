@@ -79,11 +79,10 @@ const SearchCoreSystem = (() => {
       const groups = await Promise.all(TYPES.map((type) => window.ContentCoreSystem.listContent(type, {}).catch(() => [])));
       const index = groups.flat().map(normalizeContentRecord);
       if (window.DataCoreSystem?.clear && window.DataCoreSystem?.put) {
-        // Only rewrite the store when the index actually differs. A clear+put
-        // cycle on every build bumps timestamps and dirties the store file on
-        // every boot even when no content changed. Stored records carry extra
-        // server-side keys (createdAt/updatedAt), so compare on the indexed
-        // fields only.
+        // Only rewrite the store when the index actually differs: a clear+put
+        // cycle bumps timestamps and dirties the store file even when no
+        // content changed. Stored records carry extra server-side timestamps,
+        // so compare on the indexed fields only.
         const existing = await window.DataCoreSystem.list(STORE).catch(() => null);
         const INDEX_FIELDS = [
           "contentType", "title", "body", "status", "authorId", "category",

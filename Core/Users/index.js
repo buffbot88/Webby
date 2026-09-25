@@ -1,10 +1,5 @@
-// UserCoreSystem is the identity layer.
-//
-// Passwords are never stored in plaintext: on signup (and on first login of a
-// legacy plaintext record) the password is run through PBKDF2-SHA256 with a
-// per-user random salt via WebCrypto, and only the derived hash is persisted.
-// The seed credentials below are documented defaults for a fresh install -
-// change them immediately on any real deployment.
+// UserCoreSystem is the identity layer: passwords are stored only as PBKDF2-SHA256 hashes with a per-user salt, never in plaintext.
+// The seed credentials below are documented defaults for a fresh install; change them on any real deployment.
 const UserCoreSystem = (() => {
 
   const PBKDF2_ITERATIONS = 210000;

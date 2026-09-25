@@ -22,6 +22,7 @@ const RUNTIME_SCRIPTS = [
   "assets/bookmarkCoreSystem.js",
   "assets/activityFeedCoreSystem.js",
   "assets/messagingCoreSystem.js",
+  "assets/moderationCoreSystem.js",
   "assets/reputationCoreSystem.js",
   "assets/mediaCoreSystem.js",
   "assets/categoryCoreSystem.js",

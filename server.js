@@ -1,41 +1,7 @@
 #!/usr/bin/env node
 /**
- * WebbyOS Node runtime.
- *
- * WebbyOS ships as vanilla JS plus a small PHP persistence bridge
- * (api/data.php and api/upload.php). Node-only hosts (including this
- * Freebuff workspace) have no PHP interpreter, so this server provides
- * drop-in replacements for both endpoints and serves the static site.
- *
- * The frontend contract is intentionally left untouched: DataCoreSystem
- * still calls ./api/data.php and MediaCoreSystem still calls
- * ./api/upload.php, so the same build runs on this server or on a classic
- * PHP host without any source changes.
- *
- * Storage compatibility:
- * - The encrypted store envelope format is byte-identical to api/data.php.
- * - Writes use aes-256-gcm (the cipher current PHP builds select).
- * - Reads accept aes-256-gcm *and* legacy aes-256-cbc envelopes, because
- *   stores written by older PHP installs are still readable on disk.
- *
- * Configuration:
- * - server.config.json is the primary configuration file. Recognized keys:
- *   `port`, `host`, `storageSecret`, `dataDir`, `uploadsDir`, `nodeEnv`.
- *   Empty string / missing values fall through to the documented defaults.
- * - Environment variables override the config file when both are set
- *   (WEBBYOS_STORAGE_SECRET, WEBBYOS_DATA_DIR, WEBBYOS_UPLOADS_DIR, PORT,
- *   HOST, NODE_ENV), so hosted platforms that inject values keep working.
- * - WEBBYOS_STORAGE_SECRET (or `storageSecret`) must match the secret used
- *   by api/data.php for existing stores to decrypt. When unset, the server
- *   generates and persists a random secret (database/.storage-secret) for
- *   fresh installs, and refuses to boot in production without an explicit
- *   secret. Committed stores encrypted with the historical public default
- *   are therefore unreadable to any new deployment.
- * - WEBBYOS_DATA_DIR / WEBBYOS_UPLOADS_DIR (or `dataDir` / `uploadsDir`)
- *   relocate the encrypted stores and the upload directory (useful when
- *   data must live outside the app root).
- * - PORT / HOST (or `port` / `host`) control the listen address (defaults
- *   8080 / 0.0.0.0).
+ * WebbyOS Node runtime: serves the static site and stands in for api/data.php and api/upload.php on hosts without a PHP interpreter.
+ * Configuration keys, storage locations, and secret resolution are documented in the README.
  */
 
 "use strict";
@@ -114,17 +80,12 @@ function uploadsDir() {
   return configUploadsDir();
 }
 
-// The historical hardcoded secret is public knowledge (it ships in the repo),
-// so stores written with it are readable by anyone. Resolution order:
-//   1. WEBBYOS_STORAGE_SECRET (explicit, always wins).
-//   2. A previously generated random secret persisted to database/.storage-secret.
-//   3. Otherwise: generate a random secret and persist it. This rotates away
-//      from the public default, so stores committed to the repo cannot be
-//      decrypted by a new deployment - they are treated as empty and the app
-//      re-seeds itself.
-// Production (NODE_ENV=production) never reaches 3: it refuses to boot without
-// an explicit secret, because a generated one cannot survive redeploys on
-// ephemeral filesystems.
+// The historical hardcoded secret is public knowledge, so stores written with it
+// are readable by anyone: WEBBYOS_STORAGE_SECRET wins, else a previously
+// generated secret from database/.storage-secret, else a fresh random secret
+// that new deployments cannot decrypt (those stores are treated as empty and
+// re-seeded). Production refuses to boot without an explicit secret, because a
+// generated one cannot survive redeploys on ephemeral filesystems.
 function resolveStorageSecret() {
   const fromEnv = configValue("WEBBYOS_STORAGE_SECRET", "storageSecret");
   if (fromEnv) return fromEnv;
@@ -478,8 +439,8 @@ function sendJson(res, status, payload) {
 }
 
 function readBody(req, limit) {
-  // Reject an oversized *declared* body before reading anything. Once the
-  // server starts consuming a body and then stops, the client can no longer
+  // Reject an oversized *declared* body before reading anything, because once
+  // the server starts consuming a body and then stops the client can no longer
   // reliably receive a response. Bodies without a usable length (chunked) are
   // caught by the running total below.
   const declared = Number(req.headers["content-length"]);
@@ -599,13 +560,11 @@ async function serveStatic(req, res, pathname) {
  * api/data.php replacement
  * ------------------------------------------------------------------------ */
 
-// api/data.php validates the put/update payloads with a falsy check
-// (`if (!$record)` / `if (!$patch)`), and an empty PHP array - what `{}`
-// decodes to - is falsy there. Treating `{}` as a valid payload would let
-// the Node runtime create junk records and bump timestamps where PHP answers
-// 400, so an object payload must also carry at least one key. Array payloads
-// are rejected as well: PHP would coerce a non-empty JSON list into a broken
-// record, and a 400 is the safer, still client-safe answer.
+// api/data.php validates the put/update payloads with a falsy check, and an
+// empty PHP array - what `{}` decodes to - is falsy there, so an object payload
+// must carry at least one key or the Node runtime would create junk records
+// where PHP answers 400. Array payloads are rejected too, because PHP would
+// coerce a non-empty JSON list into a broken record.
 function isNonEmptyObject(value) {
   return Boolean(
     value &&
@@ -893,13 +852,10 @@ function timestampStamp() {
   );
 }
 
-// Cap the raw upload request body BEFORE formData() parses it. Undici's
-// formData() consumes the entire stream before any field is validated, so
-// without a byte cap an attacker can stream unbounded data. Two layers:
-//   1. Reject an oversized declared Content-Length before reading anything
-//      (the connection stays healthy and the client gets a clean 413).
-//   2. A counting transform in the stream aborts when an undeclared or
-//      understated body exceeds the limit mid-flight.
+// Cap the raw upload body before formData() parses it, because Undici consumes
+// the whole stream before validating any field, letting an attacker stream
+// unbounded data. Two layers: a declared Content-Length check that returns a
+// clean 413, and a counting stream transform that aborts mid-flight.
 function uploadBodyTooLarge(res) {
   return sendJson(res, 413, { error: "Upload is too large." });
 }

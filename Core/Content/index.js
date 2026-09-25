@@ -1,5 +1,5 @@
 // ContentCoreSystem stores content records through DataCoreSystem into the encrypted PHP file DB.
-// This is a lightweight local development content layer. Production content workflows require hardened server-side content APIs.
+// This is a lightweight local development layer; production content workflows need hardened server-side APIs.
 const ContentCoreSystem = (() => {
 
   const STORE = "moduleData";
