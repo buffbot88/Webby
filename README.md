@@ -287,8 +287,8 @@ app-background (fixed art + dark wash + vignette)
 hosts that have no PHP interpreter:
 
 ```bash
-bun install        # no dependencies today; keeps the lockfile/install step healthy
-bun run dev        # or: node server.js
+npm install        # installs the Vite/React build toolchain
+npm run dev        # or: node server.js
 ```
 
 Then open:
