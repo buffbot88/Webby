@@ -40,7 +40,7 @@ Current development focus:
 - v0.60 productization and first-install experience
 - Starter/demo content and empty-state polish
 - Post-refactor module and package UX cleanup
-- Compatibility shim retention policy
+- Compatibility shim retirement (v0.50.11)
 
 WebbyOS is not yet considered production-ready or commercially released.
 
@@ -179,9 +179,8 @@ These systems completed the v0.47 public UX productization phase and passed the 
 |       `-- Account/index.js
 |-- assets/
 |   |-- theme.css
-|   `-- legacy compatibility shims for migrated Core systems
-|-- modules/pages/
-|   `-- legacy compatibility paths for public modules
+|   |-- layoutEngine.js
+|   `-- runtime support systems (builders, engines, module SDK)
 |-- api/
 |   |-- data.php
 |   `-- upload.php
@@ -191,7 +190,7 @@ These systems completed the v0.47 public UX productization phase and passed the 
 `-- layouts/
 ```
 
-`index.html` now loads the migrated `Core/` implementations first. Legacy files under `assets/` and `modules/pages/` are retained for compatibility while the shim policy remains active.
+Both entrypoints load the `Core/` implementations, and each legacy global is published by its `Core/` file. The migrated compatibility shims under `assets/` and `modules/pages/` were retired in v0.50.11, so `assets/` now holds only live runtime support systems (builders, engines, layout, module SDK).
 
 ---
 
@@ -217,6 +216,11 @@ app-background (fixed art + dark wash + vignette)
   aliased, so every existing component inherits the theme.
 - **Glass strengths**: `.glass-subtle` (nav/header), `.glass` (cards/panels),
   `.glass-strong` (modals/forms). Panels add an inset upper reflection.
+- **One stylesheet**: every glass surface, including the placeholder, upload,
+  dashboard-tile and forum-index rules that used to live in a separate
+  `theme-glass-parity.css`, is declared in `assets/theme.css`. The folded block
+  carries an extra `:root` ancestor on each selector so it keeps winning the
+  cascade without a second `<link>`.
 - **Typography**: `Cinzel` for page titles, section headings and the wordmark;
   `Inter` for all interface text.
 - **Shell rendering**: `assets/layoutEngine.js` fills the `layouts/default.html`
@@ -508,23 +512,27 @@ Status: COMPLETE
 
 Progress:
 - Diagnostics has been migrated to `Core/Diagnostics/index.js`.
-- `assets/diagnostics.js` remains as a compatibility shim.
 - DataCore has been migrated to `Core/DataCore/index.js`.
-- `assets/dataCoreSystem.js` remains as a compatibility shim.
 - PackageCore has been migrated to `Core/Packages/index.js`.
-- `assets/packageCoreSystem.js` remains as a compatibility shim.
 - Runtime has been migrated to `Core/Runtime/index.js`.
-- `assets/runtime.js` remains as a compatibility shim.
 - UserCore has been migrated to `Core/Users/index.js`.
-- `assets/userCoreSystem.js` remains as a compatibility shim.
 - ContentCore has been migrated to `Core/Content/index.js`.
-- `assets/contentCoreSystem.js` remains as a compatibility shim.
 - Builder systems have been migrated to `Core/Builders/`.
-- Legacy builder asset files remain as compatibility shims.
 - RuntimeInspector has been migrated to `Core/Diagnostics/inspector.js`.
 - AdminSystemCore has been migrated to `Core/AdminCore/index.js`.
 - Public modules have been migrated to `Core/Modules/`.
 - v0.50 final validation passed.
+
+### v0.50.11 Compatibility Shim Retirement
+
+Status: COMPLETE
+
+The temporary compatibility shims that the migration left behind have been deleted. Each `Core/` implementation is now the single source for its global:
+
+- The 12 retired `assets/` shims (`diagnostics`, `dataCoreSystem`, `packageCoreSystem`, `runtime`, `userCoreSystem`, `contentCoreSystem`, the three builder shims, `RuntimeInspector`, `adminSystemCore`, and `moduleManifest.schema`) are gone.
+- The 5 retired `modules/pages/*.js` paths are gone, along with the now-empty `modules/` directory and its build copy entry.
+- Built-in package manifests now point at the live `Core/` script paths.
+- `assets/userCoreSystem.js` (a pre-hashing copy that compared plaintext passwords) is removed; `Core/Users/index.js` with PBKDF2-SHA256 is the only authentication implementation.
 
 ## v0.60
 Productization + First Install Experience

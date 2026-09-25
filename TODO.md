@@ -1,4 +1,4 @@
-﻿# WebbyOS Staged Roadmap v0.46-v1.0
+# WebbyOS Staged Roadmap v0.46-v1.0
 
 This roadmap is the execution source of truth. Work must proceed by version stage, not as one giant migration.
 
@@ -182,7 +182,7 @@ Rules:
 
 Validation:
 - [x] Confirmed no `/Core` directory exists.
-- [x] Confirmed public modules remain unsplit under `modules/pages/`.
+- [x] Confirmed public modules remained unsplit under `modules/pages/` at the time of the v0.49 audit (they moved to `Core/Modules/` in v0.50).
 - [x] Confirmed no files were moved for v0.49.
 - [x] JavaScript parse audit passed for 37 source files.
 - [x] Public site serves 200 through the bundled PHP server.
@@ -207,11 +207,11 @@ Status: COMPLETE
 Goal: Execute the prepared migration safely, then validate product cohesion.
 
 - [x] Execute staged `/Core` migration from `REFACTOR_PLAN.md`.
-- [x] Apply compatibility shims before changing script paths.
+- [x] Apply compatibility shims before changing script paths (shims retired in v0.50.11).
 - [x] Preserve globals and record types throughout migration.
 - [x] Post-refactor integrity audit.
 - [x] Dead file/path detection.
-- [x] Compatibility shim verification.
+- [x] Compatibility shim verification (followed by shim retirement in v0.50.11).
 - [x] Route/registry audit.
 - [x] Admin console audit.
 - [x] Public module UX audit.
@@ -225,7 +225,7 @@ Status: COMPLETE
 
 - [x] Created `Core/Diagnostics/index.js`.
 - [x] Updated `index.html` to load Diagnostics from `/Core`.
-- [x] Kept `assets/diagnostics.js` as a legacy compatibility shim.
+- [x] Retired `assets/diagnostics.js` in v0.50.11; `Core/Diagnostics/index.js` is the sole source.
 - [x] Preserved `window.Diagnostics` and Diagnostics method signatures.
 - [x] JavaScript parse audit passed for 38 source files.
 - [x] Public route smoke passed after the script path change.
@@ -237,7 +237,7 @@ Status: COMPLETE
 
 - [x] Created `Core/DataCore/index.js`.
 - [x] Updated `index.html` to load DataCore from `/Core`.
-- [x] Kept `assets/dataCoreSystem.js` as a legacy compatibility shim.
+- [x] Retired `assets/dataCoreSystem.js` in v0.50.11; `Core/DataCore/index.js` is the sole source.
 - [x] Preserved `window.DataCoreSystem`, CRUD method signatures, health shape, store names, and PHP bridge behavior.
 - [x] JavaScript parse audit passed for 39 source files.
 - [x] Public route smoke passed for Home, Blog, Forums, Calendar, and Account.
@@ -252,7 +252,7 @@ Status: COMPLETE
 
 - [x] Created `Core/Packages/index.js`.
 - [x] Updated `index.html` to load PackageCore from `/Core`.
-- [x] Kept `assets/packageCoreSystem.js` as a legacy compatibility shim.
+- [x] Retired `assets/packageCoreSystem.js` in v0.50.11; `Core/Packages/index.js` is the sole source.
 - [x] Preserved `window.PackageCoreSystem`, package manifest validation, package registry APIs, lifecycle report APIs, and package health summary APIs.
 - [x] JavaScript parse audit passed for 40 source files.
 - [x] Public route smoke passed for Home, Blog, Forums, Calendar, and Account.
@@ -265,7 +265,7 @@ Status: COMPLETE
 
 - [x] Created `Core/Runtime/index.js`.
 - [x] Updated `index.html` to load Runtime from `/Core`.
-- [x] Kept `assets/runtime.js` as a legacy compatibility shim.
+- [x] Retired `assets/runtime.js` in v0.50.11; `Core/Runtime/index.js` is the sole source.
 - [x] Preserved `window.Runtime`, runtime navigation APIs, shared state APIs, recovery helpers, and safe mode flags.
 - [x] JavaScript parse audit passed for 41 source files.
 - [x] Public navigation click pass completed for Home, Blog, Forums, Calendar, and Account.
@@ -280,7 +280,7 @@ Status: COMPLETE
 
 - [x] Created `Core/Users/index.js`.
 - [x] Updated `index.html` to load UserCore from `/Core`.
-- [x] Kept `assets/userCoreSystem.js` as a legacy compatibility shim.
+- [x] Retired `assets/userCoreSystem.js` in v0.50.11; `Core/Users/index.js` is the sole source (and the only hashed-password implementation).
 - [x] Preserved `window.UserCoreSystem`, `window.UserCoreSystemUI`, authentication/session APIs, role/capability APIs, profile APIs, and route access helpers.
 - [x] JavaScript parse audit passed for 42 source files.
 - [x] Public navigation click pass completed for Home, Blog, Forums, Calendar, and Account.
@@ -294,7 +294,7 @@ Status: COMPLETE
 
 - [x] Created `Core/Content/index.js`.
 - [x] Updated `index.html` to load ContentCore from `/Core`.
-- [x] Kept `assets/contentCoreSystem.js` as a legacy compatibility shim.
+- [x] Retired `assets/contentCoreSystem.js` in v0.50.11; `Core/Content/index.js` is the sole source.
 - [x] Preserved `window.ContentCoreSystem`, content CRUD APIs, content type discovery, and record type strings.
 - [x] JavaScript parse audit passed for 43 source files.
 - [x] Public navigation click pass completed for Home, Blog, Forums, Calendar, and Account.
@@ -310,7 +310,7 @@ Status: COMPLETE
 - [x] Created `Core/Builders/navigation.js`.
 - [x] Created `Core/Builders/homepage.js`.
 - [x] Updated `index.html` to load builder systems from `/Core`.
-- [x] Kept `assets/widgetCoreSystem.js`, `assets/navigationBuilderSystem.js`, and `assets/homepageBuilderSystem.js` as legacy compatibility shims.
+- [x] Retired `assets/widgetCoreSystem.js`, `assets/navigationBuilderSystem.js`, and `assets/homepageBuilderSystem.js` in v0.50.11; `Core/Builders/` is the sole source.
 - [x] Preserved `window.WidgetCoreSystem`, `window.NavigationBuilderSystem`, and `window.HomepageBuilderSystem`.
 - [x] JavaScript parse audit passed for 46 source files.
 - [x] Home portal and public navigation rendered after the migration.
@@ -324,7 +324,7 @@ Status: COMPLETE
 
 - [x] Created `Core/Diagnostics/inspector.js`.
 - [x] Updated `index.html` to load RuntimeInspector from `/Core`.
-- [x] Kept `assets/RuntimeInspector.js` as a legacy compatibility shim.
+- [x] Retired `assets/RuntimeInspector.js` in v0.50.11; `Core/Diagnostics/inspector.js` is the sole source.
 - [x] Preserved `window.RuntimeInspector`, inspector rendering, filter, refresh, and init APIs.
 - [x] RuntimeInspector opened from Admin System after the migration.
 
@@ -333,7 +333,7 @@ Status: COMPLETE
 
 - [x] Created `Core/AdminCore/index.js`.
 - [x] Updated `index.html` to load AdminSystemCore from `/Core`.
-- [x] Kept `assets/adminSystemCore.js` as a legacy compatibility shim.
+- [x] Retired `assets/adminSystemCore.js` in v0.50.11; `Core/AdminCore/index.js` is the sole source.
 - [x] Preserved `window.AdminSystemCore` and existing Admin CP action handlers.
 - [x] Admin categories rendered: Overview, Site, Community, Content, Users & Roles, Permissions, Appearance, Builders, Extensions, Maintenance, and System.
 - [x] RuntimeInspector and Package Diagnostics rendered from Admin CP.
@@ -347,10 +347,24 @@ Status: COMPLETE
 - [x] Created `Core/Modules/Calendar/index.js`.
 - [x] Created `Core/Modules/Account/index.js`.
 - [x] Updated `index.html` to load public modules from `/Core`.
-- [x] Kept legacy `modules/pages/*.js` files available for compatibility.
+- [x] Retired legacy `modules/pages/*.js` files in v0.50.11; `Core/Modules/` is the sole source.
 - [x] Public routes rendered for Home, Blog, Forums, Calendar, and Account.
 - [x] Public subviews rendered for Blog, Forums, Calendar, and Account.
 - [x] Preserved record type strings: `blogPost`, `forumThread`, `forumPost`, and `calendarEvent`.
+
+### v0.50.11 - Compatibility Shim Retirement
+Status: COMPLETE
+
+Goal: remove the migrated legacy shims once every `Core/` implementation was proven to be the only loaded source.
+
+- [x] Confirmed both entrypoints (`index.html` and `src/main.jsx`) load only `Core/` scripts, with no dynamic `script` injection anywhere in live code.
+- [x] Confirmed every legacy global (`window.Runtime`, `window.AdminSystemCore`, `window.UserCoreSystem`, ...) is published by its `Core/` implementation.
+- [x] Deleted the 12 retired `assets/` shims and the 5 retired `modules/pages/*.js` paths.
+- [x] Removed the now-empty `modules/` copy entry from the build config.
+- [x] Repointed built-in package manifests at the live `Core/` script paths.
+- [x] Retired the stale plaintext-password shim: `Core/Users/index.js` is the only authentication implementation.
+- [x] Confirmed no test, layout, or registry entry referenced a retired path.
+- [x] Confirmed the retired files carried no live code and had silently diverged from their `Core/` counterparts.
 
 ### v0.50.99 - Final Closure Audit
 Status: COMPLETE

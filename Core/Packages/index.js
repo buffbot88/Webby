@@ -19,7 +19,7 @@ const PackageCoreSystem = (() => {
       capabilities: ["module.home"],
       widgets: ["homepage"],
       themes: [],
-      scripts: ["./modules/pages/home.js"],
+      scripts: ["./Core/Modules/Home/index.js"],
       styles: [],
       requires: { webby: ">=0.45" }
     },
@@ -35,7 +35,7 @@ const PackageCoreSystem = (() => {
       capabilities: ["module.account"],
       widgets: [],
       themes: [],
-      scripts: ["./modules/pages/account.js"],
+      scripts: ["./Core/Modules/Account/index.js"],
       styles: [],
       requires: { webby: ">=0.45" }
     },
@@ -51,7 +51,7 @@ const PackageCoreSystem = (() => {
       capabilities: ["module.blog"],
       widgets: [],
       themes: [],
-      scripts: ["./modules/pages/blog.js"],
+      scripts: ["./Core/Modules/Blog/index.js"],
       styles: [],
       requires: { webby: ">=0.45" }
     },
@@ -67,7 +67,7 @@ const PackageCoreSystem = (() => {
       capabilities: ["module.forums"],
       widgets: [],
       themes: [],
-      scripts: ["./modules/pages/forums.js"],
+      scripts: ["./Core/Modules/Forums/index.js"],
       styles: [],
       requires: { webby: ">=0.45" }
     },
@@ -83,7 +83,7 @@ const PackageCoreSystem = (() => {
       capabilities: ["module.calendar"],
       widgets: [],
       themes: [],
-      scripts: ["./modules/pages/calendar.js"],
+      scripts: ["./Core/Modules/Calendar/index.js"],
       styles: [],
       requires: { webby: ">=0.45" }
     },
@@ -99,7 +99,7 @@ const PackageCoreSystem = (() => {
       capabilities: ["builder.navigation"],
       widgets: [],
       themes: [],
-      scripts: ["./assets/navigationBuilderSystem.js"],
+      scripts: ["./Core/Builders/navigation.js"],
       styles: [],
       requires: { webby: ">=0.45" }
     },
@@ -115,7 +115,7 @@ const PackageCoreSystem = (() => {
       capabilities: ["builder.homepage"],
       widgets: [],
       themes: [],
-      scripts: ["./assets/homepageBuilderSystem.js"],
+      scripts: ["./Core/Builders/homepage.js"],
       styles: [],
       requires: { webby: ">=0.45" }
     },
@@ -131,7 +131,7 @@ const PackageCoreSystem = (() => {
       capabilities: ["builder.widgets"],
       widgets: [],
       themes: [],
-      scripts: ["./assets/widgetCoreSystem.js"],
+      scripts: ["./Core/Builders/widgets.js"],
       styles: [],
       requires: { webby: ">=0.45" }
     },

@@ -43,7 +43,7 @@ Use these steps for each subsystem in the planned order.
 
 - [x] Create the new target folder and files.
 - [x] Copy or extract behavior without changing public method signatures.
-- [x] Add or keep a legacy shim at the old script path.
+- [x] Add or keep a legacy shim at the old script path (retired again in v0.50.11 once every Core implementation was the sole loaded source).
 - [x] Assign the same legacy global.
 - [x] Keep the old script order behavior equivalent.
 - [x] Run syntax checks.
@@ -176,7 +176,7 @@ Use these steps for each subsystem in the planned order.
 - [x] Created `Core/Modules/Calendar/index.js`.
 - [x] Created `Core/Modules/Account/index.js`.
 - [x] Updated public module script paths in `index.html`.
-- [x] Kept legacy `modules/pages/*.js` files available for compatibility.
+- [x] Retired the legacy `modules/pages/*.js` files in v0.50.11; `Core/Modules/` is the only public module source.
 - [x] Verified public routes and public subviews.
 
 ## Public Module Validation
@@ -267,3 +267,14 @@ Use these steps for each subsystem in the planned order.
 - [x] No external product references are present.
 - [x] No browser storage APIs were introduced.
 - [x] Persistence bridge access remains isolated through `DataCoreSystem`.
+
+## v0.50.11 - Compatibility Shim Retirement
+
+- [x] Confirmed both entrypoints load only `Core/` scripts and that no live code injects scripts dynamically.
+- [x] Confirmed every legacy global is still published by its `Core/` implementation.
+- [x] Deleted the 12 retired `assets/` shims.
+- [x] Deleted the 5 retired `modules/pages/*.js` paths and the empty `modules/` directory.
+- [x] Removed the dead `modules` copy entry from the build config.
+- [x] Repointed built-in package manifests at the live `Core/` script paths.
+- [x] Confirmed no test, layout, or registry entry referenced a retired path.
+- [x] Removed the stale plaintext-password shim; `Core/Users/index.js` is the only authentication implementation.

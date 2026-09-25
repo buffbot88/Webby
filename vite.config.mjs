@@ -10,7 +10,6 @@ const RUNTIME_ASSETS = [
   "assets",
   "Core",
   "layouts",
-  "modules",
   "api"
 ];
 

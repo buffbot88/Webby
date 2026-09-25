@@ -63,13 +63,13 @@ After v0.50, `index.html` loads the migrated Core implementations for the system
 15. `Core/Modules/Calendar/index.js`
 16. `Core/Modules/Account/index.js`
 
-Unmigrated support systems still load from `assets/`. Legacy files under `assets/` and `modules/pages/` remain as compatibility shims or legacy compatibility paths.
+All migrated systems now load from `Core/`. The temporary compatibility shims under `assets/` and `modules/pages/` were retired in v0.50.11, so each `Core/` file is the single source for its global. `assets/` retains only live runtime support systems (builders, engines, layout, module SDK).
 
 ## Dependency Map
 
 ### Runtime
 
-Current file: `assets/runtime.js`
+Current file: `Core/Runtime/index.js`
 
 Primary dependencies:
 - `Diagnostics` for safe logging, escaping, error reporting, and operation retention.
@@ -85,7 +85,7 @@ Coupling notes:
 
 ### AdminSystemCore
 
-Current file: `assets/adminSystemCore.js`
+Current file: `Core/AdminCore/index.js`
 
 Primary dependencies:
 - `Runtime` shared state and navigation hooks.
@@ -102,7 +102,7 @@ Coupling notes:
 
 ### DataCoreSystem
 
-Current file: `assets/dataCoreSystem.js`
+Current file: `Core/DataCore/index.js`
 
 Primary dependencies:
 - `Diagnostics` for operation visibility and error capture.
@@ -116,7 +116,7 @@ Coupling notes:
 
 ### PackageCoreSystem
 
-Current file: `assets/packageCoreSystem.js`
+Current file: `Core/Packages/index.js`
 
 Primary dependencies:
 - `DataCoreSystem` for package persistence.
@@ -131,7 +131,7 @@ Coupling notes:
 
 ### Public Modules
 
-Current files: `modules/pages/home.js`, `blog.js`, `forums.js`, `calendar.js`, `account.js`
+Current files: `Core/Modules/Home/index.js`, `Blog/index.js`, `Forums/index.js`, `Calendar/index.js`, `Account/index.js` (the former `modules/pages/*.js` paths were retired in v0.50.11).
 
 Shared dependencies:
 - `ModuleSDK` for registration.
@@ -150,7 +150,7 @@ Module-specific notes:
 
 ### Builder Systems
 
-Current files: `assets/navigationBuilderSystem.js`, `assets/homepageBuilderSystem.js`, `assets/widgetCoreSystem.js`
+Current files: `Core/Builders/navigation.js`, `Core/Builders/homepage.js`, `Core/Builders/widgets.js`
 
 Primary dependencies:
 - `DataCoreSystem` for configuration persistence.
@@ -166,7 +166,7 @@ Coupling notes:
 
 ### Diagnostics And Runtime Inspector
 
-Current files: `assets/diagnostics.js`, `assets/RuntimeInspector.js`
+Current files: `Core/Diagnostics/index.js`, `Core/Diagnostics/inspector.js`
 
 Primary dependencies:
 - `Diagnostics` must load first.
@@ -194,14 +194,14 @@ Other actively used globals include diagnostics, registry, config, plugin, layou
 
 Current high-risk files by size:
 
-- `assets/adminSystemCore.js` around 110 KB: admin navigation, state, renderers, actions, diagnostics, inline handlers, permissions, package/admin tools, and builders are coupled in one file.
-- `assets/theme.css` around 52 KB: public, admin, module, card, badge, responsive, and utility styles share one stylesheet.
-- `modules/pages/forums.js` around 38 KB: state, rendering, actions, thread detail, moderation, replies, and helper logic are combined.
-- `modules/pages/calendar.js` around 30 KB: month, agenda, create, event rendering, and date helpers are combined.
-- `assets/runtime.js` around 28 KB: boot, navigation, state, recovery, rendering, and admin integration are combined.
-- `modules/pages/blog.js` around 27 KB: editorial listing, article detail, write flow, media handling, and metadata helpers are combined.
-- `assets/packageCoreSystem.js` around 26 KB: manifest loading, package registry, diagnostics, and persistence are combined.
-- `modules/pages/account.js` around 24 KB: profile, activity, inbox, standing, and account actions are combined.
+- `Core/AdminCore/index.js`: admin navigation, state, renderers, actions, diagnostics, inline handlers, permissions, package/admin tools, and builders share one file.
+- `assets/theme.css`: public, admin, module, card, badge, responsive, and utility styles share one stylesheet.
+- `Core/Modules/Forums/index.js`: state, rendering, actions, thread detail, moderation, replies, and helper logic are combined.
+- `Core/Modules/Calendar/index.js`: month, agenda, create, event rendering, and date helpers are combined.
+- `Core/Runtime/index.js`: boot, navigation, state, recovery, rendering, and admin integration are combined.
+- `Core/Modules/Blog/index.js`: editorial listing, article detail, write flow, media handling, and metadata helpers are combined.
+- `Core/Packages/index.js`: manifest loading, package registry, diagnostics, and persistence are combined.
+- `Core/Modules/Account/index.js`: profile, activity, inbox, standing, and account actions are combined.
 
 Repeated logic candidates:
 - `escape(value)` wrappers around `Diagnostics.escapeText`.
@@ -274,9 +274,9 @@ Shim requirements:
 
 ## Executed v0.50 Migration Order
 
-1. Create `/Core` folders and add shims without changing behavior.
+1. Create `/Core` folders and add shims without changing behavior (the shims were later retired in v0.50.11).
 2. Migrate Diagnostics first because every other system depends on it.
-3. Migrate DataCore with a bridge shim and verify encrypted store read/write.
+3. Migrate DataCore with a bridge shim and verify encrypted store read/write (shim retired in v0.50.11).
 4. Migrate PackageCore and verify built-in packages plus Admin Extensions.
 5. Migrate Runtime internals behind `window.Runtime`.
 6. Migrate UserCore and ContentCore while preserving record/capability behavior.
