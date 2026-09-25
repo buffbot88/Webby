@@ -145,6 +145,141 @@ const AdminSystemCore = (() => {
   let panel = null;
   let button = null;
 
+  // Settings forms rendered in the current panel. Each entry records where the
+  // values are persisted so the Save handler can rebuild the exact group.
+  const settingsForms = new Map();
+
+  const TYPOGRAPHY_FONT_OPTIONS = [
+    ["inherit", "Theme default"],
+    ["Cinzel, serif", "Cinzel (display)"],
+    ["Inter, system-ui, sans-serif", "Inter (interface)"],
+    ["Georgia, 'Times New Roman', serif", "Georgia"],
+    ["'Courier New', monospace", "Courier New"],
+    ["system-ui, sans-serif", "System UI"]
+  ];
+
+  const TYPOGRAPHY_BASE_FONT = 16;
+  const LAYOUT_CONTENT_MAX = 1380;
+
+  function readSettingsGroup(path) {
+    const settings = window.ConfigLoader?.get?.()?.settings || {};
+    let cursor = settings;
+    for (const segment of path) {
+      cursor = cursor ? cursor[segment] : undefined;
+      if (!cursor) break;
+    }
+    return cursor && typeof cursor === "object" ? cursor : {};
+  }
+
+  function applyNestedSettingsUpdate(path, value) {
+    const current = window.ConfigLoader?.get?.() || {};
+    const settings = { ...(current.settings || {}) };
+    let cursor = settings;
+    path.forEach((segment, index) => {
+      if (index === path.length - 1) {
+        cursor[segment] = value;
+        return;
+      }
+      cursor[segment] = { ...(cursor[segment] || {}) };
+      cursor = cursor[segment];
+    });
+    const next = window.ConfigLoader?.mergeConfig?.(current, { settings }) || current;
+    return window.ConfigLoader?.apply?.(next) || { success: false, error: "ConfigLoader unavailable" };
+  }
+
+  function settingsFieldId(formId, key) {
+    return `adminSet_${formId}_${key}`;
+  }
+
+  function renderSettingsControl(formId, field) {
+    const id = settingsFieldId(formId, field.key);
+    const inputStyle = "width:100%;box-sizing:border-box;padding:8px;border-radius:8px;border:1px solid rgba(148,163,184,.3);background:#0f172a;color:#f8fafc;";
+    if (field.type === "checkbox") {
+      return `<label class="admin-builder-check admin-builder-card"><input id="${id}" type="checkbox" ${field.value ? "checked" : ""} /> ${escapeText(field.label)}</label>`;
+    }
+    if (field.type === "select") {
+      return `<label style="display:grid;gap:6px;font-size:12px;color:#cbd5e1;">${escapeText(field.label)}
+        <select id="${id}" style="${inputStyle}">
+          ${(field.options || []).map(([optionValue, optionLabel]) => `<option value="${escapeText(optionValue)}" ${optionValue === field.value ? "selected" : ""}>${escapeText(optionLabel)}</option>`).join("")}
+        </select></label>`;
+    }
+    if (field.type === "textarea") {
+      return `<label style="display:grid;gap:6px;font-size:12px;color:#cbd5e1;">${escapeText(field.label)}
+        <textarea id="${id}" rows="3" style="${inputStyle}">${escapeText(field.value)}</textarea></label>`;
+    }
+    const type = field.type === "number" ? "number" : "text";
+    const range = field.type === "number" ? ` min="${field.min ?? 0}" max="${field.max ?? 100000}"` : "";
+    return `<label style="display:grid;gap:6px;font-size:12px;color:#cbd5e1;">${escapeText(field.label)}
+      <input id="${id}" type="${type}"${range} value="${escapeText(String(field.value))}" placeholder="${escapeText(field.placeholder || "")}" style="${inputStyle}" /></label>`;
+  }
+
+  function renderSettingsCard(spec) {
+    const group = readSettingsGroup(spec.path);
+    const resolved = {
+      ...spec,
+      fields: spec.fields.map((field) => ({ ...field, value: group[field.key] ?? field.default }))
+    };
+    settingsForms.set(resolved.id, resolved);
+    return `
+      <div class="admin-builder-card">
+        <div class="admin-builder-title">${escapeText(resolved.title)}</div>
+        <div class="admin-builder-note">${escapeText(resolved.note)}</div>
+        ${resolved.fields.map((field) => renderSettingsControl(resolved.id, field)).join("")}
+        <button onclick="window.AdminCoreActions.saveSettingsForm(${jsAttrArg(resolved.id)})">Save ${escapeText(resolved.title)}</button>
+      </div>
+    `;
+  }
+
+  function saveSettingsForm(formId) {
+    if (!requireAdminMutation("settings save")) return;
+    const spec = settingsForms.get(formId);
+    if (!spec) {
+      state.statusMessage = `Settings save failed: unknown form ${formId}.`;
+      renderPanel();
+      return;
+    }
+    const value = {};
+    spec.fields.forEach((field) => {
+      const element = document.getElementById(settingsFieldId(formId, field.key));
+      if (!element) {
+        value[field.key] = field.value;
+        return;
+      }
+      if (field.type === "checkbox") value[field.key] = element.checked === true;
+      else if (field.type === "number") value[field.key] = Number(element.value);
+      else value[field.key] = element.value;
+    });
+    const result = applyNestedSettingsUpdate(spec.path, value);
+    if (spec.id === "appearance-typography") applyTypographySettings();
+    state.statusMessage = result.success ? `${spec.title} saved.` : `Settings save failed: ${result.error}`;
+    renderPanel();
+  }
+
+  // Actions introduced alongside the settings forms. Declaring them early keeps
+  // inline handlers working even though the main action surface is assembled at
+  // the end of the module.
+  function installActionSurface() {
+    window.AdminCoreActions = {
+      saveSettingsForm,
+      runCleanupPurgeTrash,
+      runCleanupSessions,
+      runRepairSearchIndex,
+      runRepairPackages,
+      runRepairConfig,
+      issueWarning,
+      issueSuspension,
+      liftModerationRecord
+    };
+  }
+
+  function attachActionSurface() {
+    if (window.AdminSystemCore) {
+      Object.assign(window.AdminSystemCore, window.AdminCoreActions || {});
+    }
+  }
+
+  installActionSurface();
+
   function escapeText(value) {
     if (window.AdminCoreUtils?.escapeText) {
       return window.AdminCoreUtils.escapeText(value);
@@ -227,6 +362,8 @@ const AdminSystemCore = (() => {
     createPanel();
     createButton();
     updateButtonState();
+    applyTypographySettings();
+    attachActionSurface();
     window.Lifecycle?.on?.("user:login", updateButtonState);
     window.Lifecycle?.on?.("user:logout", updateButtonState);
     window.Lifecycle?.on?.("user:register", updateButtonState);
@@ -461,23 +598,115 @@ const AdminSystemCore = (() => {
       case "siteFeatures":
         return renderSiteFeaturesTab(ctx);
       case "siteMode":
-        return renderComingSoonCard("Site Mode", "Coming later: public, private, and maintenance mode controls are not implemented yet.");
+        return renderSiteModeTab(ctx);
       case "communityForums":
         return renderCommunityForumTab();
       case "communityMessaging":
-        return renderCommunityStoreSummary("Messaging", ["conversations", "messages"], "Conversation and private message settings will live here.");
+        return renderCommunityStoreSummary("Messaging", ["conversations", "messages"], "Direct message policy and delivery state for the community.", {
+          id: "community-messaging",
+          title: "Messaging Settings",
+          note: "Direct message policy for the community.",
+          path: ["community", "messaging"],
+          fields: [
+            { key: "enabled", label: "Enable direct messaging", type: "checkbox", default: true },
+            { key: "maxParticipants", label: "Max participants per conversation", type: "number", default: 8, min: 2, max: 100 },
+            { key: "allowAttachments", label: "Allow attachments", type: "checkbox", default: false },
+            { key: "retentionDays", label: "Message retention (days, 0 = forever)", type: "number", default: 0, min: 0, max: 3650 },
+            { key: "visibility", label: "New conversations visible to", type: "select", default: "participants", options: [["participants", "Participants only"], ["moderators", "Participants and moderators"]] }
+          ]
+        });
       case "communityNotifications":
-        return renderCommunityStoreSummary("Notifications", ["notifications"], "Notification delivery and digest settings will live here.");
+        return renderCommunityStoreSummary("Notifications", ["notifications"], "Notification delivery and digest settings.", {
+          id: "community-notifications",
+          title: "Notification Settings",
+          note: "Delivery rules for forum, content, and account notifications.",
+          path: ["community", "notifications"],
+          fields: [
+            { key: "enabled", label: "Enable notifications", type: "checkbox", default: true },
+            { key: "digestFrequency", label: "Digest frequency", type: "select", default: "instant", options: [["instant", "Instant"], ["hourly", "Hourly digest"], ["daily", "Daily digest"], ["off", "Off"]] },
+            { key: "forumReplies", label: "Notify on forum replies", type: "checkbox", default: true },
+            { key: "mentions", label: "Notify on mentions", type: "checkbox", default: true },
+            { key: "announcements", label: "Notify on announcements", type: "checkbox", default: true },
+            { key: "maxPerDigest", label: "Max notifications per digest", type: "number", default: 25, min: 1, max: 200 }
+          ]
+        });
       case "communityReputation":
-        return renderCommunityStoreSummary("Reputation", ["reputation", "userBadges", "reactions"], "Reputation rules, badges, and scoring controls will live here.");
+        return renderCommunityStoreSummary("Reputation", ["reputation", "userBadges", "reactions"], "Reputation rules, badges, and scoring controls.", {
+          id: "community-reputation",
+          title: "Reputation Settings",
+          note: "Score weights and badge milestones for community participation.",
+          path: ["community", "reputation"],
+          fields: [
+            { key: "enabled", label: "Enable reputation scoring", type: "checkbox", default: true },
+            { key: "threadCreatedPoints", label: "Points per new thread", type: "number", default: 5, min: 0, max: 100 },
+            { key: "replyPoints", label: "Points per reply", type: "number", default: 2, min: 0, max: 100 },
+            { key: "helpfulReceivedPoints", label: "Points per helpful mark", type: "number", default: 10, min: 0, max: 100 },
+            { key: "blogPostPoints", label: "Points per published article", type: "number", default: 15, min: 0, max: 100 },
+            { key: "badgeMilestones", label: "Badge milestones", type: "text", default: "trusted:100, elder:500", placeholder: "badge:score, badge:score" },
+            { key: "showOnProfiles", label: "Show reputation on public profiles", type: "checkbox", default: true }
+          ]
+        });
       case "communityModeration":
-        return renderCommunityStoreSummary("Moderation", ["reports", "moderationLogs"], "Moderation queues, report policy, and reviewer summaries will live here.");
+        return renderCommunityStoreSummary("Moderation", ["reports", "moderationLogs", "userWarnings", "userSuspensions"], "Moderation queues, report policy, and reviewer summaries.", {
+          id: "community-moderation",
+          title: "Moderation Settings",
+          note: "Report intake and reviewer defaults. Account state lives under Users & Roles.",
+          path: ["community", "moderation"],
+          fields: [
+            { key: "requireReportReason", label: "Require a reason on every report", type: "checkbox", default: true },
+            { key: "autoHideThreshold", label: "Reports before content is auto-hidden (0 = never)", type: "number", default: 3, min: 0, max: 50 },
+            { key: "defaultSuspensionHours", label: "Default suspension length (hours)", type: "number", default: 24, min: 1, max: 8760 },
+            { key: "allowSelfReview", label: "Allow reporters to close their own report", type: "checkbox", default: false },
+            { key: "notifyOnReport", label: "Notify moderators on new reports", type: "checkbox", default: true },
+            { key: "reportQueueSize", label: "Reports shown per queue page", type: "number", default: 50, min: 10, max: 200 }
+          ]
+        });
       case "communityActivity":
-        return renderCommunityStoreSummary("Activity Feed", ["activityFeed"], "Activity feed visibility and aggregation settings will live here.");
+        return renderCommunityStoreSummary("Activity Feed", ["activityFeed"], "Activity feed visibility and aggregation settings.", {
+          id: "community-activity",
+          title: "Activity Feed Settings",
+          note: "Which events enter the feed and how much of it stays visible.",
+          path: ["community", "activity"],
+          fields: [
+            { key: "enabled", label: "Enable the activity feed", type: "checkbox", default: true },
+            { key: "publicFeed", label: "Public visitors can read the feed", type: "checkbox", default: true },
+            { key: "showReactions", label: "Include reactions", type: "checkbox", default: true },
+            { key: "showForumReplies", label: "Include forum replies", type: "checkbox", default: true },
+            { key: "showRegistrations", label: "Include new member joins", type: "checkbox", default: false },
+            { key: "retentionDays", label: "Feed retention (days, 0 = forever)", type: "number", default: 0, min: 0, max: 3650 },
+            { key: "pageSize", label: "Feed items per page", type: "number", default: 20, min: 5, max: 100 }
+          ]
+        });
       case "contentBlog":
-        return renderContentWorkflowSummary("Blog", "Blog publishing workflow settings and post defaults belong here.");
+        return renderContentWorkflowSummary("Blog", "Blog publishing workflow settings and post defaults.", {
+          id: "content-blog",
+          title: "Blog Defaults",
+          note: "Defaults applied when authors write new articles.",
+          path: ["content", "blog"],
+          fields: [
+            { key: "requireApproval", label: "Require reviewer approval", type: "checkbox", default: false },
+            { key: "defaultStatus", label: "Default status", type: "select", default: "draft", options: [["draft", "Draft"], ["published", "Published"]] },
+            { key: "allowComments", label: "Allow comments", type: "checkbox", default: true },
+            { key: "allowScheduling", label: "Allow scheduled posts", type: "checkbox", default: true },
+            { key: "postsPerPage", label: "Articles per page", type: "number", default: 10, min: 3, max: 50 },
+            { key: "defaultCategory", label: "Default category", type: "text", default: "general" }
+          ]
+        });
       case "contentCalendar":
-        return renderContentWorkflowSummary("Calendar", "Calendar publishing workflow settings and event defaults belong here.");
+        return renderContentWorkflowSummary("Calendar", "Calendar publishing workflow settings and event defaults.", {
+          id: "content-calendar",
+          title: "Calendar Defaults",
+          note: "Defaults applied when members create new events.",
+          path: ["content", "calendar"],
+          fields: [
+            { key: "requireApproval", label: "Require reviewer approval", type: "checkbox", default: false },
+            { key: "defaultStatus", label: "Default status", type: "select", default: "draft", options: [["draft", "Draft"], ["published", "Published"]] },
+            { key: "defaultDurationMinutes", label: "Default event length (minutes)", type: "number", default: 60, min: 15, max: 1440 },
+            { key: "allowPublicSubmission", label: "Members may submit events", type: "checkbox", default: true },
+            { key: "allowRecurring", label: "Allow recurring events", type: "checkbox", default: true },
+            { key: "weekStartsOn", label: "Week starts on", type: "select", default: "sunday", options: [["sunday", "Sunday"], ["monday", "Monday"]] }
+          ]
+        });
       case "contentCategories":
         return renderCmsTab("categories");
       case "contentTags":
@@ -487,7 +716,7 @@ const AdminSystemCore = (() => {
       case "contentSearch":
         return renderSearchIndexTab();
       case "contentPublishing":
-        return renderComingSoonCard("Publishing Rules", "Coming later: editorial approvals and cross-module publishing defaults are not implemented yet.");
+        return renderContentPublishingTab(ctx);
       case "usersList":
         return renderUsersListTab();
       case "usersProfiles":
@@ -495,7 +724,7 @@ const AdminSystemCore = (() => {
       case "usersRoles":
         return renderUsersRolesTab();
       case "usersStatus":
-        return renderComingSoonCard("Account Status", "Coming later: verification, lockout, and account state workflows are not implemented yet.");
+        return renderAccountStatusTab(ctx);
       case "usersWarnings":
         return renderUsersWarningsTab();
       case "permissionsCapabilities":
@@ -520,7 +749,7 @@ const AdminSystemCore = (() => {
       case "appearanceColors":
         return renderThemeColorsTab(ctx);
       case "appearanceTypography":
-        return renderComingSoonCard("Typography", "Coming later: typography controls are not implemented yet.");
+        return renderTypographyTab(ctx);
       case "appearanceBrand":
         return renderBrandVisualsTab(ctx);
       case "appearanceDensity":
@@ -534,7 +763,7 @@ const AdminSystemCore = (() => {
       case "builderVisibility":
         return renderModuleVisibilityTab();
       case "builderLayouts":
-        return renderComingSoonCard("Layouts", "Coming later: layout-slot composition controls are not implemented yet.");
+        return renderLayoutsTab(ctx);
       case "extensionsPackages":
         return renderPackagesTab();
       case "extensionsModules":
@@ -548,7 +777,7 @@ const AdminSystemCore = (() => {
       case "extensionsDiagnostics":
         return renderPackageDiagnosticsTab();
       case "maintenanceCleanup":
-        return renderComingSoonCard("Cleanup Tools", "Coming later: cleanup actions are not implemented yet.");
+        return renderCleanupToolsTab(ctx);
       case "maintenanceCache":
         return renderSearchIndexTab("Cache / Search Rebuild");
       case "maintenanceDiagnostics":
@@ -558,7 +787,7 @@ const AdminSystemCore = (() => {
       case "maintenanceMedia":
         return renderMediaTab();
       case "maintenanceRepair":
-        return renderComingSoonCard("Repair Tools", "Coming later: repair actions are not implemented yet.");
+        return renderRepairToolsTab(ctx);
       case "systemRuntime":
         return renderRuntimeTab(ctx);
       case "systemRegistry":
@@ -734,19 +963,22 @@ const AdminSystemCore = (() => {
     `;
   }
 
-  function renderCommunityStoreSummary(title, stores, emptyText) {
+  function renderCommunityStoreSummary(title, stores, emptyText, settings = null) {
     return `
-      <div class="admin-panel">
-        <div class="admin-panel-title">${escapeText(title)}</div>
-        <div class="admin-muted">${escapeText(emptyText)}</div>
-        <div class="admin-status-strip" style="margin-top:10px;">
-          ${stores.map((store) => `<div class="admin-status-item">${escapeText(store)}<br><span class="admin-badge">${window.DataCoreSystem?.getStores?.().includes(store) ? "store ready" : "store unavailable"}</span></div>`).join("")}
+      <div class="admin-builder-stack">
+        <div class="admin-panel">
+          <div class="admin-panel-title">${escapeText(title)}</div>
+          <div class="admin-muted">${escapeText(emptyText)}</div>
+          <div class="admin-status-strip" style="margin-top:10px;">
+            ${stores.map((store) => `<div class="admin-status-item">${escapeText(store)}<br><span class="admin-badge">${window.DataCoreSystem?.getStores?.().includes(store) ? "store ready" : "store unavailable"}</span></div>`).join("")}
+          </div>
         </div>
+        ${settings ? renderSettingsCard(settings) : ""}
       </div>
     `;
   }
 
-  function renderContentWorkflowSummary(title, body) {
+  function renderContentWorkflowSummary(title, body, settings = null) {
     const route = (getSharedState().registry || {})[title.toLowerCase()];
     const contentType = title === "Blog" ? "blogPost" : title === "Calendar" ? "calendarEvent" : null;
     const moduleReady = title === "Blog" ? window.BlogModuleUI?.refresh : title === "Calendar" ? window.CalendarModuleUI?.refresh : null;
@@ -769,8 +1001,441 @@ const AdminSystemCore = (() => {
             <button onclick="window.${title === "Blog" ? "BlogModuleUI" : "CalendarModuleUI"}?.refresh?.()">Refresh ${escapeText(title)} Module</button>
           </div>
         </div>
+        ${settings ? renderSettingsCard(settings) : ""}
       </div>
     `;
+  }
+
+  function renderSiteModeTab({ registryRoutes }) {
+    const mode = readSettingsGroup(["siteMode"]);
+    const currentMode = mode.mode || "public";
+    const routes = Object.keys(registryRoutes || {}).length;
+    return `
+      <div class="admin-builder-stack">
+        <div class="admin-panel">
+          <div class="admin-panel-title">Site Mode</div>
+          <div class="admin-muted">Availability policy for the public site. The saved mode is read back here, so operators always see the live value instead of the last form submission.</div>
+          <div class="admin-status-strip" style="margin-top:10px;">
+            <div class="admin-status-item">Current mode<br><span class="admin-badge">${escapeText(currentMode)}</span></div>
+            <div class="admin-status-item">Registered routes<br><span class="admin-badge">${routes}</span></div>
+            <div class="admin-status-item">Admin access<br><span class="admin-badge">${hasAdminAccess() ? "verified" : "limited"}</span></div>
+          </div>
+        </div>
+        ${renderSettingsCard({
+          id: "site-mode",
+          title: "Site Mode",
+          note: "Public serves every visitor, Private requires a signed-in account, Maintenance shows the notice below to non-admin visitors.",
+          path: ["siteMode"],
+          fields: [
+            { key: "mode", label: "Mode", type: "select", default: "public", options: [["public", "Public"], ["private", "Private (sign-in required)"], ["maintenance", "Maintenance"]] },
+            { key: "notice", label: "Maintenance notice", type: "textarea", default: "WebbyOS is undergoing scheduled maintenance. Please check back shortly." },
+            { key: "allowAdminBypass", label: "Keep admin access during maintenance", type: "checkbox", default: true },
+            { key: "expectedReturn", label: "Expected return", type: "text", default: "", placeholder: "2026-01-01 09:00 UTC" }
+          ]
+        })}
+      </div>
+    `;
+  }
+
+  function renderContentPublishingTab() {
+    const rules = readSettingsGroup(["publishing"]);
+    return `
+      <div class="admin-builder-stack">
+        <div class="admin-panel">
+          <div class="admin-panel-title">Publishing Rules</div>
+          <div class="admin-muted">Editorial defaults applied to new content across the Blog, Calendar, and CMS modules.</div>
+          <div class="admin-status-strip" style="margin-top:10px;">
+            <div class="admin-status-item">Approvals<br><span class="admin-badge">${rules.requireApproval ? "required" : "optional"}</span></div>
+            <div class="admin-status-item">Default status<br><span class="admin-badge">${escapeText(rules.defaultStatus || "draft")}</span></div>
+            <div class="admin-status-item">Scheduling<br><span class="admin-badge">${rules.allowScheduling === false ? "disabled" : "enabled"}</span></div>
+            <div class="admin-status-item">ContentCore<br><span class="admin-badge">${window.ContentCoreSystem?.listContent ? "ready" : "unavailable"}</span></div>
+          </div>
+        </div>
+        ${renderSettingsCard({
+          id: "content-publishing",
+          title: "Publishing Rules",
+          note: "Cross-module editorial approvals and publishing defaults.",
+          path: ["publishing"],
+          fields: [
+            { key: "requireApproval", label: "Require reviewer approval before publishing", type: "checkbox", default: false },
+            { key: "defaultStatus", label: "Default status for new content", type: "select", default: "draft", options: [["draft", "Draft"], ["published", "Published"]] },
+            { key: "allowScheduling", label: "Allow scheduled publishing", type: "checkbox", default: true },
+            { key: "allowBackdating", label: "Allow backdated publish times", type: "checkbox", default: true },
+            { key: "editorRoles", label: "Roles allowed to publish", type: "text", default: "admin, moderator" },
+            { key: "maxDraftsPerAuthor", label: "Max drafts per author (0 = unlimited)", type: "number", default: 0, min: 0, max: 1000 }
+          ]
+        })}
+      </div>
+    `;
+  }
+
+  function renderAccountStatusTab() {
+    setTimeout(() => loadAccountStatusPanel(), 0);
+    return `
+      <div class="admin-builder-stack">
+        <div class="admin-panel">
+          <div class="admin-panel-title">Account Status</div>
+          <div class="admin-muted">Verification, lockout, and suspension state per account, derived from the user store and the moderation stores.</div>
+          <div id="adminAccountStatusPanel" class="admin-status-strip" style="margin-top:10px;">
+            <div class="admin-muted">Loading account state...</div>
+          </div>
+        </div>
+        ${renderSettingsCard({
+          id: "account-status",
+          title: "Account Policy",
+          note: "Lockout and verification policy stored in the settings store.",
+          path: ["accountStatus"],
+          fields: [
+            { key: "requireVerification", label: "Require account verification", type: "checkbox", default: false },
+            { key: "lockoutThreshold", label: "Failed logins before lockout", type: "number", default: 5, min: 0, max: 50 },
+            { key: "lockoutMinutes", label: "Lockout duration (minutes)", type: "number", default: 15, min: 1, max: 1440 },
+            { key: "autoSuspend", label: "Auto-suspend on repeated reports", type: "checkbox", default: false },
+            { key: "reportsBeforeSuspend", label: "Reports before auto-suspend", type: "number", default: 3, min: 1, max: 50 }
+          ]
+        })}
+      </div>
+    `;
+  }
+
+  async function loadAccountStatusPanel() {
+    const container = document.getElementById("adminAccountStatusPanel");
+    if (!container) return;
+    const users = window.UserCoreSystem?.listUsers?.() || [];
+    const [warnings, suspensions] = await Promise.all([readStoreSafe("userWarnings"), readStoreSafe("userSuspensions")]);
+    const activeWarnings = warnings.filter((item) => item.active !== false);
+    const suspendedIds = new Set(suspensions.filter((item) => item.active !== false).map((item) => item.userId));
+    container.innerHTML = users.length ? users.map((user) => {
+      const warningCount = activeWarnings.filter((item) => item.userId === user.id).length;
+      const state = suspendedIds.has(user.id) ? "suspended" : warningCount > 0 ? "warned" : "active";
+      const badge = state === "suspended" ? "admin-badge admin-badge-danger" : state === "warned" ? "admin-badge admin-badge-warning" : "admin-badge admin-badge-success";
+      return `
+        <div class="admin-status-item">
+          ${escapeText(user.displayName || user.username)}<br>
+          <span class="${badge}">${escapeText(state)}</span>
+          <span class="admin-badge">${escapeText(user.role || "user")}</span>
+          <span class="admin-badge">${warningCount} warnings</span>
+        </div>
+      `;
+    }).join("") : `<div class="admin-muted">No accounts available.</div>`;
+  }
+
+  async function readStoreSafe(store) {
+    if (!window.DataCoreSystem?.list) return [];
+    try {
+      const records = await window.DataCoreSystem.list(store);
+      return Array.isArray(records) ? records : [];
+    } catch (err) {
+      return [];
+    }
+  }
+
+  function renderTypographyTab() {
+    const typography = readSettingsGroup(["typography"]);
+    return `
+      <div class="admin-builder-stack">
+        <div class="admin-panel">
+          <div class="admin-panel-title">Typography</div>
+          <div class="admin-muted">Font families and scale for the public site and Admin CP. Saved values are applied to the document root; "Theme default" keeps the Midnight Glass tokens untouched.</div>
+          <div class="admin-status-strip" style="margin-top:10px;">
+            <div class="admin-status-item">Display font<br><span class="admin-badge">${escapeText(typography.displayFont && typography.displayFont !== "inherit" ? typography.displayFont : "theme default")}</span></div>
+            <div class="admin-status-item">Interface font<br><span class="admin-badge">${escapeText(typography.uiFont && typography.uiFont !== "inherit" ? typography.uiFont : "theme default")}</span></div>
+            <div class="admin-status-item">Base size<br><span class="admin-badge">${escapeText(String(typography.baseFontSize || TYPOGRAPHY_BASE_FONT))}px</span></div>
+          </div>
+        </div>
+        ${renderSettingsCard({
+          id: "appearance-typography",
+          title: "Typography",
+          note: "Values are applied live through CSS custom properties on the document root.",
+          path: ["typography"],
+          fields: [
+            { key: "displayFont", label: "Display font (titles)", type: "select", default: "inherit", options: TYPOGRAPHY_FONT_OPTIONS },
+            { key: "uiFont", label: "Interface font (body)", type: "select", default: "inherit", options: TYPOGRAPHY_FONT_OPTIONS },
+            { key: "baseFontSize", label: "Base font size (px)", type: "number", default: TYPOGRAPHY_BASE_FONT, min: 12, max: 20 },
+            { key: "headingScale", label: "Heading scale", type: "select", default: "balanced", options: [["compact", "Compact"], ["balanced", "Balanced"], ["dramatic", "Dramatic"]] },
+            { key: "lineHeight", label: "Body line height", type: "select", default: "normal", options: [["tight", "Tight"], ["normal", "Normal"], ["relaxed", "Relaxed"]] },
+            { key: "headingTracking", label: "Letter-spacing on headings", type: "select", default: "theme", options: [["theme", "Theme default"], ["tight", "Tight"], ["wide", "Wide"]] }
+          ]
+        })}
+      </div>
+    `;
+  }
+
+  function applyTypographySettings() {
+    if (!document || !document.documentElement) return;
+    const typography = readSettingsGroup(["typography"]);
+    const root = document.documentElement;
+    if (typography.displayFont && typography.displayFont !== "inherit") {
+      root.style.setProperty("--font-display", typography.displayFont);
+    } else {
+      root.style.removeProperty("--font-display");
+    }
+    if (typography.uiFont && typography.uiFont !== "inherit") {
+      root.style.setProperty("--font-ui", typography.uiFont);
+    } else {
+      root.style.removeProperty("--font-ui");
+    }
+    const size = Number(typography.baseFontSize);
+    if (Number.isFinite(size) && size >= 12 && size <= 20) {
+      root.style.fontSize = `${size}px`;
+    } else {
+      root.style.removeProperty("font-size");
+    }
+  }
+
+  function renderLayoutsTab({ registryRoutes }) {
+    const layouts = readSettingsGroup(["layouts"]);
+    const routes = Object.values(registryRoutes || {});
+    const layoutIds = Array.from(new Set(routes.map((route) => route.layout).filter(Boolean)));
+    const layoutOptions = [["default", "Default (theme shell)"]].concat(layoutIds.filter((id) => id !== "default").map((id) => [id, id]));
+    return `
+      <div class="admin-builder-stack">
+        <div class="admin-panel">
+          <div class="admin-panel-title">Layouts</div>
+          <div class="admin-muted">Layout-slot composition for the application shell. Route-level layout assignment stays in the registry; these values set the shared defaults.</div>
+          <div class="admin-status-strip" style="margin-top:10px;">
+            <div class="admin-status-item">Default layout<br><span class="admin-badge">${escapeText(layouts.defaultLayout || "default")}</span></div>
+            <div class="admin-status-item">Rail position<br><span class="admin-badge">${escapeText(layouts.railPosition || "left")}</span></div>
+            <div class="admin-status-item">Content width<br><span class="admin-badge">${escapeText(String(layouts.contentMaxWidth || LAYOUT_CONTENT_MAX))}px</span></div>
+            <div class="admin-status-item">Routes<br><span class="admin-badge">${routes.length}</span></div>
+          </div>
+        </div>
+        ${renderSettingsCard({
+          id: "builder-layouts",
+          title: "Layout Composition",
+          note: "Shared shell defaults. Per-route layout assignments remain under System > Registry.",
+          path: ["layouts"],
+          fields: [
+            { key: "defaultLayout", label: "Default layout", type: "select", default: "default", options: layoutOptions },
+            { key: "railPosition", label: "Navigation rail", type: "select", default: "left", options: [["left", "Left rail"], ["right", "Right rail"], ["bottom", "Bottom (mobile style)"]] },
+            { key: "contentMaxWidth", label: "Max content width (px)", type: "number", default: LAYOUT_CONTENT_MAX, min: 900, max: 1920 },
+            { key: "stickyTopbar", label: "Sticky top bar", type: "checkbox", default: true },
+            { key: "showBreadcrumbs", label: "Show breadcrumbs above content", type: "checkbox", default: false },
+            { key: "footerSlots", label: "Footer slots (comma separated)", type: "text", default: "main", placeholder: "main, legal" }
+          ]
+        })}
+        <div class="admin-builder-card">
+          <div class="admin-builder-title">Registered Routes</div>
+          ${routes.map((route) => `<div class="admin-builder-row"><div><div class="admin-builder-title">${escapeText(route.label || route.id)}</div><div class="admin-builder-note">${escapeText(route.id)} → ${escapeText(route.layout || "default")}</div></div></div>`).join("") || `<div class="admin-builder-empty">No routes registered.</div>`}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderCleanupToolsTab() {
+    const cleanup = readSettingsGroup(["cleanup"]);
+    return `
+      <div class="admin-builder-stack">
+        <div class="admin-panel">
+          <div class="admin-panel-title">Cleanup Tools</div>
+          <div class="admin-muted">Bulk housekeeping actions. Each action reports exactly what it removed and never touches account records.</div>
+          <div class="admin-status-strip" style="margin-top:10px;">
+            <div class="admin-status-item">Last cleanup<br><span class="admin-badge">${escapeText(cleanup.lastCleanupAt || "never")}</span></div>
+            <div class="admin-status-item">ContentCore<br><span class="admin-badge">${window.ContentCoreSystem?.listContent ? "ready" : "unavailable"}</span></div>
+            <div class="admin-status-item">DataCore<br><span class="admin-badge">${window.DataCoreSystem?.list ? "ready" : "unavailable"}</span></div>
+          </div>
+          <div class="admin-actions" style="margin-top:10px;">
+            <button onclick="window.AdminCoreActions.runCleanupPurgeTrash()">Purge Trashed Content</button>
+            <button onclick="window.AdminCoreActions.runCleanupSessions()">Clear Orphaned Sessions</button>
+          </div>
+        </div>
+        ${renderSettingsCard({
+          id: "maintenance-cleanup",
+          title: "Retention",
+          note: "Retention windows are recorded for operators. Nothing on this page deletes content automatically.",
+          path: ["cleanup"],
+          fields: [
+            { key: "trashRetentionDays", label: "Trashed content retention (days)", type: "number", default: 30, min: 0, max: 365 },
+            { key: "activityRetentionDays", label: "Activity feed retention (days, 0 = forever)", type: "number", default: 0, min: 0, max: 3650 },
+            { key: "sessionRetentionDays", label: "Inactive session retention (days)", type: "number", default: 30, min: 1, max: 365 }
+          ]
+        })}
+      </div>
+    `;
+  }
+
+  async function runCleanupPurgeTrash() {
+    if (!requireAdminMutation("cleanup")) return;
+    const content = window.ContentCoreSystem;
+    if (!content?.listContent || !content?.deleteContent) {
+      state.statusMessage = "Cleanup failed: ContentCoreSystem unavailable.";
+      renderPanel();
+      return;
+    }
+    try {
+      // Force a load so getContentTypes() can report every type in the store.
+      await content.listContent("blogPost", {}).catch(() => []);
+      const types = content.getContentTypes?.() || [];
+      let removed = 0;
+      for (const type of types) {
+        const records = await content.listContent(type, {}).catch(() => []);
+        for (const record of toArray(records)) {
+          if (record.status !== "trash") continue;
+          await content.deleteContent(type, record.id);
+          removed += 1;
+        }
+      }
+      markCleanupRun();
+      state.statusMessage = removed ? `Cleanup removed ${removed} trashed record(s).` : "Cleanup found no trashed content.";
+    } catch (err) {
+      state.statusMessage = `Cleanup failed: ${err.message || err}`;
+    }
+    renderPanel();
+  }
+
+  async function runCleanupSessions() {
+    if (!requireAdminMutation("cleanup")) return;
+    try {
+      const sessions = await readStoreSafe("sessions");
+      const userIds = new Set((window.UserCoreSystem?.listUsers?.() || []).map((user) => user.id));
+      let removed = 0;
+      for (const session of sessions) {
+        if (!session?.id || userIds.has(session.userId)) continue;
+        await window.DataCoreSystem?.remove?.("sessions", session.id);
+        removed += 1;
+      }
+      markCleanupRun();
+      state.statusMessage = removed ? `Cleanup removed ${removed} orphaned session(s).` : "Cleanup found no orphaned sessions.";
+    } catch (err) {
+      state.statusMessage = `Cleanup failed: ${err.message || err}`;
+    }
+    renderPanel();
+  }
+
+  function markCleanupRun() {
+    const cleanup = readSettingsGroup(["cleanup"]);
+    applyNestedSettingsUpdate(["cleanup"], {
+      trashRetentionDays: cleanup.trashRetentionDays ?? 30,
+      activityRetentionDays: cleanup.activityRetentionDays ?? 0,
+      sessionRetentionDays: cleanup.sessionRetentionDays ?? 30,
+      lastCleanupAt: new Date().toISOString()
+    });
+  }
+
+  function renderRepairToolsTab({ registryRoutes }) {
+    const health = window.SearchCoreSystem?.getIndexHealth?.() || {};
+    const packages = getPackageRecords();
+    return `
+      <div class="admin-builder-stack">
+        <div class="admin-panel">
+          <div class="admin-panel-title">Repair Tools</div>
+          <div class="admin-muted">Recovery actions for the derived stores and runtime state. None of these actions delete authored content.</div>
+          <div class="admin-status-strip" style="margin-top:10px;">
+            <div class="admin-status-item">Index records<br><span class="admin-badge">${health.cachedRecords ?? 0}</span></div>
+            <div class="admin-status-item">Last index build<br><span class="admin-badge">${escapeText(health.lastBuiltAt || "never")}</span></div>
+            <div class="admin-status-item">Installed packages<br><span class="admin-badge">${packages.length}</span></div>
+            <div class="admin-status-item">Routes<br><span class="admin-badge">${Object.keys(registryRoutes || {}).length}</span></div>
+          </div>
+          <div class="admin-actions" style="margin-top:10px;">
+            <button onclick="window.AdminCoreActions.runRepairSearchIndex()">Rebuild Search Index</button>
+            <button onclick="window.AdminCoreActions.runRepairPackages()">Validate Package Manifests</button>
+            <button onclick="window.AdminCoreActions.runRepairConfig()">Re-apply Saved Configuration</button>
+          </div>
+        </div>
+        ${renderSettingsCard({
+          id: "maintenance-repair",
+          title: "Repair Policy",
+          note: "Boot-time recovery behavior stored in the settings store.",
+          path: ["repair"],
+          fields: [
+            { key: "rebuildIndexOnBoot", label: "Rebuild the search index on boot", type: "checkbox", default: false },
+            { key: "verifyStoresOnBoot", label: "Verify encrypted stores on boot", type: "checkbox", default: true },
+            { key: "autoRepairSessions", label: "Drop orphaned sessions automatically", type: "checkbox", default: true },
+            { key: "bootFailureAction", label: "On repeated boot failure", type: "select", default: "safe-mode", options: [["safe-mode", "Enter safe mode"], ["retry", "Retry normally"], ["report", "Report only"]] }
+          ]
+        })}
+      </div>
+    `;
+  }
+
+  async function runRepairSearchIndex() {
+    if (!requireAdminMutation("repair")) return;
+    try {
+      const index = await window.SearchCoreSystem?.buildIndex?.({ force: true });
+      state.statusMessage = `Search index rebuilt (${toArray(index).length} record(s)).`;
+    } catch (err) {
+      state.statusMessage = `Search index rebuild failed: ${err.message || err}`;
+    }
+    renderPanel();
+  }
+
+  function runRepairPackages() {
+    if (!requireAdminMutation("repair")) return;
+    const validate = window.PackageCoreSystem?.validatePackageSet;
+    if (!validate) {
+      state.statusMessage = "Package validation failed: PackageCoreSystem unavailable.";
+      renderPanel();
+      return;
+    }
+    const manifests = getPackageRecords().map((record) => record.manifest).filter(Boolean);
+    const report = validate(manifests) || {};
+    const issues = toArray(report.errors).concat(toArray(report.warnings));
+    state.statusMessage = issues.length
+      ? `Package validation reported ${issues.length} issue(s).`
+      : `Package validation passed for ${manifests.length} manifest(s).`;
+    renderPanel();
+  }
+
+  function runRepairConfig() {
+    if (!requireAdminMutation("repair")) return;
+    const loader = window.ConfigLoader;
+    if (!loader?.get || !loader?.apply) {
+      state.statusMessage = "Config re-apply failed: ConfigLoader unavailable.";
+      renderPanel();
+      return;
+    }
+    const result = loader.apply(loader.get());
+    state.statusMessage = result.success ? "Saved configuration re-applied." : `Config re-apply failed: ${result.error}`;
+    renderPanel();
+    window.Runtime?.navigate?.(window.Runtime.getState?.().route || "home", { updateHash: false });
+  }
+
+  async function issueWarning() {
+    if (!requireAdminMutation("warning issue")) return;
+    const userId = fieldValue("adminWarnUser");
+    const reason = fieldValue("adminWarnReason");
+    if (!userId) {
+      state.statusMessage = "Warning failed: select an account first.";
+      renderPanel();
+      return;
+    }
+    try {
+      await window.ModerationCoreSystem?.warnUser?.(userId, reason);
+      state.statusMessage = `Warning issued for ${userId}.`;
+    } catch (err) {
+      state.statusMessage = `Warning failed: ${err.message || err}`;
+    }
+    renderPanel();
+  }
+
+  async function issueSuspension() {
+    if (!requireAdminMutation("suspension issue")) return;
+    const userId = fieldValue("adminSuspendUser");
+    const reason = fieldValue("adminSuspendReason");
+    const hours = Number(fieldValue("adminSuspendHours"));
+    if (!userId) {
+      state.statusMessage = "Suspension failed: select an account first.";
+      renderPanel();
+      return;
+    }
+    const expiresAt = hours > 0 ? new Date(Date.now() + hours * 3600 * 1000).toISOString() : "";
+    try {
+      await window.ModerationCoreSystem?.suspendUser?.(userId, reason, expiresAt);
+      state.statusMessage = hours > 0 ? `Suspension issued for ${userId} (${hours}h).` : `Indefinite suspension issued for ${userId}.`;
+    } catch (err) {
+      state.statusMessage = `Suspension failed: ${err.message || err}`;
+    }
+    renderPanel();
+  }
+
+  async function liftModerationRecord(store, id) {
+    if (!requireAdminMutation("moderation clear")) return;
+    try {
+      await window.DataCoreSystem?.update?.(store, id, { active: false });
+      state.statusMessage = "Moderation record cleared.";
+    } catch (err) {
+      state.statusMessage = `Clear failed: ${err.message || err}`;
+    }
+    renderPanel();
   }
 
   function renderRevisionsTab() {
@@ -836,7 +1501,65 @@ const AdminSystemCore = (() => {
   }
 
   function renderUsersWarningsTab() {
-    return renderComingSoonCard("Warnings / Suspensions", "Warning and suspension overviews will live here without editing permission rules.");
+    setTimeout(() => loadWarningsPanel(), 0);
+    const users = window.UserCoreSystem?.listUsers?.() || [];
+    const userOptions = users.map((user) => `<option value="${escapeText(user.id)}">${escapeText(user.displayName || user.username)}</option>`).join("");
+    return `
+      <div class="admin-builder-stack">
+        <div class="admin-panel">
+          <div class="admin-panel-title">Warnings / Suspensions</div>
+          <div class="admin-muted">Account-level moderation state. Warnings and suspensions live in their own stores, so moderation never rewrites roles or capability rules.</div>
+          <div id="adminWarningsPanel" class="admin-status-strip" style="margin-top:10px;">
+            <div class="admin-muted">Loading moderation state...</div>
+          </div>
+        </div>
+        <div class="admin-builder-card">
+          <div class="admin-builder-title">Issue Warning</div>
+          <div class="admin-builder-note">Records an active warning against an account. Warnings are advisory and never revoke access.</div>
+          <label>Account
+            <select id="adminWarnUser">${userOptions}</select>
+          </label>
+          <label>Reason<input id="adminWarnReason" placeholder="Repeated off-topic posts" /></label>
+          <button onclick="window.AdminSystemCore.issueWarning()">Issue Warning</button>
+        </div>
+        <div class="admin-builder-card">
+          <div class="admin-builder-title">Suspend Account</div>
+          <div class="admin-builder-note">Suspensions stay reversible: clearing one only deactivates the record.</div>
+          <label>Account
+            <select id="adminSuspendUser">${userOptions}</select>
+          </label>
+          <label>Reason<input id="adminSuspendReason" placeholder="Terms of service violation" /></label>
+          <label>Duration (hours, 0 = indefinite)<input id="adminSuspendHours" type="number" value="24" min="0" max="8760" /></label>
+          <button onclick="window.AdminSystemCore.issueSuspension()">Suspend Account</button>
+        </div>
+      </div>
+    `;
+  }
+
+  async function loadWarningsPanel() {
+    const container = document.getElementById("adminWarningsPanel");
+    if (!container) return;
+    const [warnings, suspensions] = await Promise.all([readStoreSafe("userWarnings"), readStoreSafe("userSuspensions")]);
+    const activeWarnings = warnings.filter((item) => item.active !== false);
+    const activeSuspensions = suspensions.filter((item) => item.active !== false);
+    const renderRecord = (item, kind) => `
+      <div class="admin-builder-row">
+        <div>
+          <div class="admin-builder-title">${escapeText(item.userId || "unknown")}</div>
+          <div class="admin-builder-note">${escapeText(kind)} · ${escapeText(item.reason || "no reason recorded")}</div>
+          <div class="admin-muted">By ${escapeText(item.moderatorId || "system")}${item.expiresAt ? ` · expires ${escapeText(item.expiresAt)}` : ""}</div>
+        </div>
+        <div class="admin-builder-actions">
+          <button onclick="window.AdminSystemCore.liftModerationRecord(${jsAttrArg(kind === "warning" ? "userWarnings" : "userSuspensions")}, ${jsAttrArg(item.id)})">Clear</button>
+        </div>
+      </div>
+    `;
+    container.innerHTML = (activeSuspensions.length || activeWarnings.length)
+      ? [
+          ...activeSuspensions.map((item) => renderRecord(item, "suspension")),
+          ...activeWarnings.map((item) => renderRecord(item, "warning"))
+        ].join("")
+      : `<div class="admin-muted">No active warnings or suspensions.</div>`;
   }
 
   function renderRoutePermissionsTab({ registryRoutes }) {
