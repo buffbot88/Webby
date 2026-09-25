@@ -371,3 +371,48 @@
     margin-left: 0;
   }
 }
+
+/* =========================================================
+   ENVIRONMENT SELECTION
+
+   The base environment is the desktop valley. These two rules swap
+   in the natively authored compositions that a single artwork cannot
+   serve: a wider scene for ultrawide displays, and an alternate
+   composition for authentication surfaces.
+========================================================= */
+
+/* Ultrawide: at 2200px and up the desktop scene is scaled past its
+   native width and cropped, so the citadel drifts out of frame. */
+@media (min-width: 2200px) {
+  .app-background-art {
+    background-image: url("./brand/webby-night-ultrawide.svg");
+    background-position: center 36%;
+  }
+}
+
+/* Authentication surface: same world, alternate composition, with the
+   crystal architecture held to the right so the sign-in panel sits on
+   the near-dark left half.
+
+   Reached by setting data-background-mode="auth" on the document root.
+   configLoader.js currently normalises that attribute against
+   ["soft", "plain", "contrast"], so this value needs to be added to that
+   allowlist (and to the Admin theme select) before it can be selected. */
+:root[data-background-mode="auth"] .app-background-art {
+  background-image: url("./brand/webby-auth.svg");
+  background-position: center 44%;
+}
+
+:root[data-background-mode="auth"] .app-background::after {
+  background:
+    radial-gradient(120% 90% at 78% 8%, rgba(3, 12, 26, 0.1), rgba(1, 6, 12, 0.86) 76%),
+    linear-gradient(rgba(1, 6, 12, 0.42), rgba(1, 6, 12, 0.84));
+}
+
+/* On small screens the auth composition is cropped to a narrow slice, so
+   fall back to the portrait scene and keep the panel legible. */
+@media (max-width: 768px) {
+  :root[data-background-mode="auth"] .app-background-art {
+    background-image: url("./brand/webby-night-portrait.svg");
+  }
+}

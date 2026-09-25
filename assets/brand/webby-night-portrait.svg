@@ -1,61 +1,121 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 2560" width="1440" height="2560" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Midnight fantasy valley, portrait">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 2560" width="1440" height="2560" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Midnight fantasy valley with a distant citadel, portrait">
   <defs>
     <linearGradient id="pSky" x1="0" y1="0" x2="0" y2="2560" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#030914"/>
-      <stop offset="0.3" stop-color="#061630"/>
-      <stop offset="0.44" stop-color="#0C2E52"/>
+      <stop offset="0.28" stop-color="#061630"/>
+      <stop offset="0.42" stop-color="#0C2E52"/>
       <stop offset="0.5" stop-color="#071B33"/>
       <stop offset="1" stop-color="#030A15"/>
     </linearGradient>
-    <radialGradient id="pGlow" cx="960" cy="1080" r="700" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#4EA8FF" stop-opacity="0.24"/>
+    <radialGradient id="pGlow" cx="1040" cy="1180" r="780" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#4EA8FF" stop-opacity="0.26"/>
       <stop offset="1" stop-color="#030914" stop-opacity="0"/>
     </radialGradient>
-    <radialGradient id="pMoonGlow" cx="420" cy="420" r="300" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#DCEBFF" stop-opacity="0.5"/>
+    <radialGradient id="pMoonGlow" cx="1040" cy="540" r="330" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#DCEBFF" stop-opacity="0.55"/>
       <stop offset="1" stop-color="#030914" stop-opacity="0"/>
     </radialGradient>
-    <linearGradient id="pVignette" x1="0" y1="0" x2="0" y2="2560" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#02080F" stop-opacity="0.5"/>
-      <stop offset="0.3" stop-color="#02080F" stop-opacity="0"/>
-      <stop offset="1" stop-color="#02070D" stop-opacity="0.92"/>
+    <linearGradient id="pMist" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#9FC8F2" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#9FC8F2" stop-opacity="0.16"/>
+      <stop offset="1" stop-color="#9FC8F2" stop-opacity="0"/>
     </linearGradient>
+    <linearGradient id="pFall" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#BEE2FF" stop-opacity="0.4"/>
+      <stop offset="1" stop-color="#9FD4FF" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="pShade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#02080F" stop-opacity="0"/>
+      <stop offset="1" stop-color="#02080F" stop-opacity="0.5"/>
+    </linearGradient>
+    <linearGradient id="pVignette" x1="0" y1="0" x2="0" y2="2560" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#02080F" stop-opacity="0.52"/>
+      <stop offset="0.26" stop-color="#02080F" stop-opacity="0"/>
+      <stop offset="1" stop-color="#02070D" stop-opacity="0.94"/>
+    </linearGradient>
+    <filter id="pBlur" x="-30%" y="-60%" width="160%" height="220%">
+      <feGaussianBlur stdDeviation="22"/>
+    </filter>
   </defs>
 
   <rect width="1440" height="2560" fill="url(#pSky)"/>
   <rect width="1440" height="2560" fill="url(#pGlow)"/>
 
+  <!-- starfield: two depth tiers only, mobile keeps detail light -->
   <g fill="#EAF3FF">
-    <g opacity="0.8">
-      <circle cx="140" cy="200" r="2.4"/><circle cx="330" cy="330" r="1.8"/><circle cx="560" cy="140" r="2.2"/>
-      <circle cx="760" cy="420" r="1.7"/><circle cx="980" cy="220" r="2.4"/><circle cx="1180" cy="480" r="1.8"/>
-      <circle cx="1300" cy="180" r="2.1"/><circle cx="220" cy="640" r="1.7"/><circle cx="620" cy="720" r="2"/>
-      <circle cx="1120" cy="760" r="1.8"/><circle cx="880" cy="620" r="1.6"/><circle cx="1350" cy="820" r="1.9"/>
+    <g opacity="0.82">
+      <circle cx="170" cy="210" r="2.4"/><circle cx="352" cy="340" r="1.9"/><circle cx="560" cy="146" r="2.2"/>
+      <circle cx="770" cy="430" r="1.8"/><circle cx="960" cy="228" r="2.4"/><circle cx="1180" cy="486" r="1.9"/>
+      <circle cx="1310" cy="186" r="2.1"/><circle cx="226" cy="646" r="1.8"/><circle cx="612" cy="726" r="2"/>
+      <circle cx="1124" cy="762" r="1.9"/><circle cx="874" cy="618" r="1.7"/><circle cx="1352" cy="826" r="2"/>
     </g>
-    <g opacity="0.4">
-      <circle cx="260" cy="480" r="1.5"/><circle cx="470" cy="560" r="1.4"/><circle cx="700" cy="880" r="1.6"/>
-      <circle cx="1040" cy="980" r="1.4"/><circle cx="1260" cy="640" r="1.5"/><circle cx="180" cy="900" r="1.4"/>
+    <g opacity="0.42">
+      <circle cx="268" cy="486" r="1.5"/><circle cx="470" cy="566" r="1.4"/><circle cx="702" cy="884" r="1.6"/>
+      <circle cx="1042" cy="982" r="1.4"/><circle cx="1262" cy="644" r="1.5"/><circle cx="186" cy="902" r="1.4"/>
+      <circle cx="820" cy="304" r="1.4"/><circle cx="1230" cy="1020" r="1.3"/>
     </g>
   </g>
 
-  <circle cx="420" cy="420" r="300" fill="url(#pMoonGlow)"/>
-  <circle cx="420" cy="420" r="96" fill="#DCEBFF" opacity="0.92"/>
+  <!-- moon sits well above the citadel so it reads as backlight -->
+  <circle cx="1040" cy="540" r="330" fill="url(#pMoonGlow)"/>
+  <circle cx="1040" cy="540" r="104" fill="#DCEBFF" opacity="0.92"/>
+  <circle cx="1006" cy="512" r="16" fill="#B9D3EF" opacity="0.36"/>
+  <circle cx="1064" cy="574" r="11" fill="#B9D3EF" opacity="0.32"/>
 
-  <!-- distant castle, small and far -->
+  <!-- three ridge layers, the castle set well back on the third -->
+  <path d="M0 1420 L200 1348 L420 1418 L640 1350 L880 1424 L1120 1356 L1360 1430 L1440 1394 L1440 1600 L0 1600 Z"
+        fill="#123150" opacity="0.84"/>
+  <path d="M0 1544 L240 1470 L500 1550 L760 1478 L1020 1556 L1280 1486 L1440 1542 L1440 1720 L0 1720 Z"
+        fill="#0C2440" opacity="0.92"/>
+  <path d="M0 1652 L260 1590 L540 1660 L820 1596 L1100 1664 L1380 1602 L1440 1626 L1440 1820 L0 1820 Z"
+        fill="#081A2E"/>
+
+  <!-- distant citadel with two waterfalls -->
+  <path d="M520 1660 L580 1600 L760 1636 L900 1560 L1040 1628 L1180 1552 L1310 1622 L1440 1580 L1440 1700 L520 1700 Z"
+        fill="#0A1F38"/>
   <g>
-    <path d="M700 1330 L900 1240 L1080 1300 L1200 1210 L1320 1290 L1440 1240 L1440 1400 L700 1400 Z" fill="#0A1F38"/>
-    <path d="M980 1264 L1000 1122 L1020 1264 Z" fill="#0D2743"/>
-    <path d="M1120 1268 L1146 1104 L1172 1268 Z" fill="#0D2743"/>
-    <path d="M1240 1284 L1262 1148 L1284 1284 Z" fill="#0A1F38"/>
-    <g fill="#E1BC72" opacity="0.6">
-      <rect x="1002" y="1204" width="7" height="12"/><rect x="1148" y="1180" width="7" height="12"/>
-      <rect x="1264" y="1214" width="7" height="12"/>
-    </g>
+    <path d="M614 1626 L624 1478 L672 1478 L682 1626 Z" fill="#0D2743"/>
+    <path d="M630 1478 L648 1394 L666 1478 Z" fill="#0A1F38"/>
+    <path d="M760 1652 L772 1440 L828 1440 L840 1652 Z" fill="#0D2743"/>
+    <path d="M778 1440 L800 1330 L822 1440 Z" fill="#0A1F38"/>
+    <rect x="796" y="1316" width="5" height="16" fill="#0D2743"/>
+    <path d="M900 1644 L912 1480 L962 1480 L974 1644 Z" fill="#0D2743"/>
+    <path d="M918 1480 L937 1402 L956 1480 Z" fill="#0A1F38"/>
+    <path d="M1052 1652 L1064 1450 L1116 1450 L1128 1652 Z" fill="#0D2743"/>
+    <path d="M1070 1450 L1090 1348 L1110 1450 Z" fill="#0A1F38"/>
+    <path d="M1180 1660 L1192 1524 L1236 1524 L1248 1660 Z" fill="#0D2743"/>
+    <path d="M1198 1524 L1214 1454 L1230 1524 Z" fill="#0A1F38"/>
+    <path d="M1300 1668 L1312 1560 L1352 1560 L1364 1668 Z" fill="#0D2743"/>
+  </g>
+  <!-- window lights, sparse by design -->
+  <g fill="#E1BC72" opacity="0.7">
+    <rect x="790" y="1490" width="5" height="9"/><rect x="808" y="1490" width="5" height="9"/>
+    <rect x="790" y="1540" width="5" height="9"/><rect x="808" y="1540" width="5" height="9"/>
+    <rect x="920" y="1512" width="5" height="9"/><rect x="940" y="1512" width="5" height="9"/>
+    <rect x="1076" y="1500" width="5" height="9"/><rect x="1096" y="1500" width="5" height="9"/>
+    <rect x="1076" y="1552" width="5" height="9"/><rect x="1204" y="1568" width="5" height="9"/>
+    <rect x="1222" y="1568" width="5" height="9"/><rect x="1320" y="1600" width="5" height="9"/>
+  </g>
+  <g fill="url(#pFall)">
+    <rect x="836" y="1698" width="14" height="120"/>
+    <rect x="1120" y="1698" width="12" height="96"/>
+  </g>
+  <g stroke="#DCF0FF" stroke-opacity="0.3" stroke-width="2" stroke-linecap="round">
+    <path d="M843 1704 V1806"/><path d="M1126 1704 V1784"/>
   </g>
 
-  <!-- layered ridges, lots of dark negative space below -->
-  <path d="M0 1500 L200 1420 L420 1500 L640 1430 L880 1510 L1120 1440 L1360 1516 L1440 1470 L1440 1660 L0 1660 Z" fill="#0C2440" opacity="0.92"/>
-  <path d="M0 1680 L240 1600 L500 1684 L760 1610 L1020 1690 L1280 1620 L1440 1676 L1440 1900 L0 1900 Z" fill="#071829"/>
-  <rect x="0" y="1880" width="1440" height="680" fill="#050F1C" opacity="0.9"/>
+  <!-- mist bands -->
+  <g filter="url(#pBlur)">
+    <ellipse cx="620" cy="1720" rx="560" ry="46" fill="url(#pMist)"/>
+    <ellipse cx="1080" cy="1796" rx="640" ry="44" fill="url(#pMist)"/>
+    <ellipse cx="700" cy="1884" rx="720" ry="40" fill="url(#pMist)"/>
+  </g>
+
+  <!-- deep dark negative space below the citadel: the interface sits here -->
+  <rect x="0" y="1830" width="1440" height="730" fill="#050F1C" opacity="0.94"/>
+  <rect x="0" y="1830" width="1440" height="730" fill="url(#pShade)"/>
+  <path d="M0 1830 L200 1798 L430 1846 L660 1804 L880 1852 L1120 1808 L1340 1858 L1440 1824 L1440 1900 L0 1900 Z"
+        fill="#071829" opacity="0.8"/>
+
   <rect width="1440" height="2560" fill="url(#pVignette)"/>
 </svg>

@@ -1,0 +1,210 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2560 1440" width="2560" height="1440" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Midnight crystal citadel, alternate composition for the sign-in surface">
+  <defs>
+    <linearGradient id="aSky" x1="0" y1="0" x2="0" y2="1440" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#02070F"/>
+      <stop offset="0.26" stop-color="#040E20"/>
+      <stop offset="0.46" stop-color="#0A2547"/>
+      <stop offset="0.54" stop-color="#071932"/>
+      <stop offset="1" stop-color="#02070F"/>
+    </linearGradient>
+    <radialGradient id="aGlow" cx="1960" cy="820" r="900" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#7FB4FF" stop-opacity="0.26"/>
+      <stop offset="0.45" stop-color="#5A6BE0" stop-opacity="0.12"/>
+      <stop offset="1" stop-color="#02070F" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="aMoonGlow" cx="1980" cy="250" r="380" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#DCEBFF" stop-opacity="0.55"/>
+      <stop offset="0.34" stop-color="#8FC4FF" stop-opacity="0.18"/>
+      <stop offset="1" stop-color="#02070F" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="aMoonBody" cx="1948" cy="218" r="210" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F2F8FF"/>
+      <stop offset="0.7" stop-color="#CFE2FA"/>
+      <stop offset="1" stop-color="#A6C3E6"/>
+    </radialGradient>
+    <linearGradient id="aCrystal" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#1B3D6B" stop-opacity="0.92"/>
+      <stop offset="0.45" stop-color="#2F4E96" stop-opacity="0.72"/>
+      <stop offset="0.8" stop-color="#6E7BE0" stop-opacity="0.44"/>
+      <stop offset="1" stop-color="#BEE2FF" stop-opacity="0.34"/>
+    </linearGradient>
+    <linearGradient id="aCrystalAlt" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#12345C" stop-opacity="0.9"/>
+      <stop offset="0.5" stop-color="#2A5C93" stop-opacity="0.66"/>
+      <stop offset="1" stop-color="#7FD8F5" stop-opacity="0.32"/>
+    </linearGradient>
+    <linearGradient id="aFacet" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#DCF1FF" stop-opacity="0.3"/>
+      <stop offset="1" stop-color="#DCF1FF" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="aMist" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#A9CDF5" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#A9CDF5" stop-opacity="0.16"/>
+      <stop offset="1" stop-color="#A9CDF5" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="aWater" x1="0" y1="1020" x2="0" y2="1440" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0A2340"/>
+      <stop offset="0.34" stop-color="#061527"/>
+      <stop offset="1" stop-color="#02070F"/>
+    </linearGradient>
+    <linearGradient id="aFall" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#CFECFF" stop-opacity="0.4"/>
+      <stop offset="1" stop-color="#9FD4FF" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="aLeftShade" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#01060C" stop-opacity="0.88"/>
+      <stop offset="0.42" stop-color="#01060C" stop-opacity="0.6"/>
+      <stop offset="0.78" stop-color="#01060C" stop-opacity="0.2"/>
+      <stop offset="1" stop-color="#01060C" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="aVignetteY" x1="0" y1="0" x2="0" y2="1440" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#01060C" stop-opacity="0.66"/>
+      <stop offset="0.32" stop-color="#01060C" stop-opacity="0"/>
+      <stop offset="1" stop-color="#01060C" stop-opacity="0.9"/>
+    </linearGradient>
+    <linearGradient id="aVignetteX" x1="0" y1="0" x2="2560" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#01060C" stop-opacity="0.5"/>
+      <stop offset="0.3" stop-color="#01060C" stop-opacity="0"/>
+      <stop offset="0.86" stop-color="#01060C" stop-opacity="0"/>
+      <stop offset="1" stop-color="#01060C" stop-opacity="0.32"/>
+    </linearGradient>
+    <filter id="aBlurSoft" x="-20%" y="-60%" width="140%" height="220%">
+      <feGaussianBlur stdDeviation="26"/>
+    </filter>
+    <filter id="aBlurTiny" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="6"/>
+    </filter>
+  </defs>
+
+  <rect width="2560" height="1440" fill="url(#aSky)"/>
+  <rect width="2560" height="1440" fill="url(#aGlow)"/>
+
+  <!-- sparse starfield: the sign-in surface stays quiet -->
+  <g fill="#EAF3FF">
+    <g opacity="0.78">
+      <circle cx="220" cy="160" r="1.5"/><circle cx="470" cy="292" r="1.2"/><circle cx="720" cy="128" r="1.4"/>
+      <circle cx="960" cy="320" r="1.1"/><circle cx="1180" cy="180" r="1.5"/><circle cx="1400" cy="86" r="1.2"/>
+      <circle cx="1640" cy="140" r="1.4"/><circle cx="2240" cy="120" r="1.6"/><circle cx="2400" cy="268" r="1.2"/>
+      <circle cx="2510" cy="150" r="1.4"/><circle cx="880" cy="430" r="1.2"/><circle cx="1300" cy="400" r="1.1"/>
+    </g>
+    <g opacity="0.4">
+      <circle cx="340" cy="440" r="1.1"/><circle cx="600" cy="520" r="1"/><circle cx="1080" cy="540" r="1.1"/>
+      <circle cx="1520" cy="470" r="1"/><circle cx="1900" cy="96" r="1.1"/><circle cx="2340" cy="400" r="1"/>
+    </g>
+  </g>
+
+  <!-- moon high behind the crystal spires -->
+  <circle cx="1980" cy="250" r="380" fill="url(#aMoonGlow)"/>
+  <circle cx="1980" cy="250" r="116" fill="url(#aMoonBody)"/>
+  <g fill="#B9D3EF" opacity="0.3">
+    <circle cx="1942" cy="216" r="20"/><circle cx="2024" cy="278" r="13"/><circle cx="1966" cy="296" r="9"/>
+  </g>
+
+  <!-- three ridge layers -->
+  <path d="M0 806 L180 730 L400 800 L640 722 L880 806 L1120 730 L1360 812 L1600 736 L1840 816 L2080 742 L2320 820 L2560 752 L2560 960 L0 960 Z"
+        fill="#0E2A4A" opacity="0.8"/>
+  <path d="M0 806 L180 730 L400 800 L640 722 L880 806 L1120 730 L1360 812 L1600 736 L1840 816 L2080 742 L2320 820 L2560 752"
+        fill="none" stroke="#8DC2F0" stroke-opacity="0.13" stroke-width="2"/>
+  <path d="M0 878 L240 824 L480 886 L720 828 L960 890 L1200 832 L1440 894 L1680 836 L1920 900 L2160 842 L2400 904 L2560 866 L2560 1010 L0 1010 Z"
+        fill="#071829" opacity="0.94"/>
+  <path d="M0 938 L280 896 L560 950 L840 902 L1120 956 L1400 908 L1680 962 L1960 914 L2240 968 L2520 920 L2560 936 L2560 1050 L0 1050 Z"
+        fill="#040E1C"/>
+
+  <!-- crystal architecture: glow, faceted spires, gateway, shards -->
+  <g opacity="0.5" filter="url(#aBlurSoft)">
+    <ellipse cx="1760" cy="640" rx="300" ry="380" fill="#6E7BE0" opacity="0.3"/>
+    <ellipse cx="2160" cy="700" rx="260" ry="330" fill="#55DCFF" opacity="0.2"/>
+  </g>
+
+  <!-- crystal base terrace -->
+  <path d="M1470 1000 L2560 966 L2560 1060 L1470 1060 Z" fill="#0A1F38"/>
+  <g stroke="#9FD4FF" stroke-opacity="0.16" stroke-width="2">
+    <path d="M1470 1014 H2560"/><path d="M1470 1034 H2560"/>
+  </g>
+
+  <!-- spire 1 -->
+  <path d="M1515 1000 L1546 470 L1560 320 L1584 470 L1610 1000 Z" fill="url(#aCrystal)"/>
+  <path d="M1546 470 L1560 320 L1584 470 Z" fill="url(#aFacet)"/>
+  <path d="M1515 1000 L1560 320" fill="none" stroke="#DCF1FF" stroke-opacity="0.28" stroke-width="1.6"/>
+  <!-- spire 2: tallest -->
+  <path d="M1690 1000 L1734 400 L1750 196 L1776 400 L1820 1000 Z" fill="url(#aCrystalAlt)"/>
+  <path d="M1734 400 L1750 196 L1776 400 Z" fill="url(#aFacet)"/>
+  <path d="M1690 1000 L1750 196" fill="none" stroke="#DCF1FF" stroke-opacity="0.34" stroke-width="2"/>
+  <circle cx="1750" cy="186" r="8" fill="#CFECFF" opacity="0.5"/>
+  <!-- spire 3 -->
+  <path d="M1902 1000 L1930 480 L1946 362 L1968 480 L1998 1000 Z" fill="url(#aCrystal)"/>
+  <path d="M1930 480 L1946 362 L1968 480 Z" fill="url(#aFacet)"/>
+  <path d="M1902 1000 L1946 362" fill="none" stroke="#DCF1FF" stroke-opacity="0.26" stroke-width="1.6"/>
+  <!-- spire 4 -->
+  <path d="M2062 1000 L2098 440 L2116 250 L2142 440 L2182 1000 Z" fill="url(#aCrystalAlt)"/>
+  <path d="M2098 440 L2116 250 L2142 440 Z" fill="url(#aFacet)"/>
+  <path d="M2062 1000 L2116 250" fill="none" stroke="#DCF1FF" stroke-opacity="0.32" stroke-width="2"/>
+  <circle cx="2116" cy="240" r="7" fill="#CFECFF" opacity="0.48"/>
+  <!-- spire 5 -->
+  <path d="M2252 1000 L2284 540 L2300 440 L2318 540 L2350 1000 Z" fill="url(#aCrystal)"/>
+  <path d="M2284 540 L2300 440 L2318 540 Z" fill="url(#aFacet)"/>
+  <!-- spire 6: shortest, far right -->
+  <path d="M2408 1000 L2436 640 L2450 568 L2466 640 L2496 1000 Z" fill="url(#aCrystalAlt)"/>
+  <path d="M2436 640 L2450 568 L2466 640 Z" fill="url(#aFacet)"/>
+
+  <!-- crystal gateway arch between spires 1 and 2 -->
+  <path d="M1616 1000 L1616 716 Q1648 648 1680 716 L1680 1000 L1658 1000 L1658 730 Q1648 698 1638 730 L1638 1000 Z"
+        fill="url(#aCrystalAlt)"/>
+  <path d="M1616 1000 L1616 716 Q1648 648 1680 716 L1680 1000" fill="none" stroke="#DCF1FF" stroke-opacity="0.24" stroke-width="1.6"/>
+
+  <!-- floating crystal shards -->
+  <g fill="#BEE2FF" opacity="0.28">
+    <path d="M1478 560 l14 -30 l14 30 l-14 30 Z"/>
+    <path d="M1560 402 l10 -22 l10 22 l-10 22 Z"/>
+    <path d="M1846 470 l12 -26 l12 26 l-12 26 Z"/>
+    <path d="M2210 356 l9 -20 l9 20 l-9 20 Z"/>
+    <path d="M2516 470 l11 -24 l11 24 l-11 24 Z"/>
+    <path d="M2040 588 l8 -18 l8 18 l-8 18 Z"/>
+    <path d="M2360 620 l10 -22 l10 22 l-10 22 Z"/>
+  </g>
+
+  <!-- crystal waterfalls -->
+  <g opacity="0.55" filter="url(#aBlurTiny)" fill="url(#aFall)">
+    <rect x="1690" y="1004" width="82" height="140"/>
+    <rect x="2040" y="1004" width="96" height="124"/>
+    <rect x="2300" y="1004" width="58" height="96"/>
+  </g>
+  <g fill="url(#aFall)">
+    <rect x="1722" y="1000" width="16" height="152"/>
+    <rect x="2082" y="1000" width="20" height="134"/>
+    <rect x="2322" y="1000" width="13" height="104"/>
+  </g>
+  <g stroke="#E3F4FF" stroke-opacity="0.3" stroke-width="2" stroke-linecap="round">
+    <path d="M1730 1006 V1146"/><path d="M2092 1006 V1130"/><path d="M2328 1006 V1096"/>
+  </g>
+
+  <!-- mist -->
+  <g filter="url(#aBlurSoft)">
+    <ellipse cx="700" cy="952" rx="820" ry="50" fill="url(#aMist)"/>
+    <ellipse cx="1780" cy="930" rx="660" ry="46" fill="url(#aMist)"/>
+    <ellipse cx="2200" cy="990" rx="620" ry="44" fill="url(#aMist)"/>
+    <ellipse cx="420" cy="1030" rx="620" ry="40" fill="url(#aMist)"/>
+    <ellipse cx="1500" cy="1074" rx="1000" ry="38" fill="url(#aMist)"/>
+  </g>
+
+  <!-- dark water, deliberately understated -->
+  <rect x="0" y="1020" width="2560" height="420" fill="url(#aWater)"/>
+  <g opacity="0.22" filter="url(#aBlurTiny)" fill="#9FD4FF">
+    <rect x="1746" y="1030" width="66" height="270"/>
+    <rect x="2106" y="1040" width="56" height="240"/>
+    <rect x="2340" y="1050" width="36" height="180"/>
+  </g>
+  <g stroke="#8FC8FF" stroke-opacity="0.1" stroke-width="3" stroke-linecap="round">
+    <path d="M900 1062 H1440"/><path d="M1020 1122 H1560"/><path d="M860 1196 H1380"/>
+    <path d="M1140 1274 H1700"/><path d="M980 1360 H1520"/>
+  </g>
+
+  <!-- foreground rock shelves -->
+  <path d="M0 1200 L300 1140 L640 1216 L960 1156 L1240 1246 L1360 1440 L0 1440 Z" fill="#03080F" opacity="0.94"/>
+  <path d="M2560 1188 L2320 1140 L2100 1214 L1900 1170 L1760 1266 L1720 1440 L2560 1440 Z" fill="#03080F" opacity="0.86"/>
+
+  <!-- shading: wide near-dark negative space on the left for the sign-in panel -->
+  <rect width="1660" height="1440" fill="url(#aLeftShade)"/>
+  <rect width="2560" height="1440" fill="url(#aVignetteY)"/>
+  <rect width="2560" height="1440" fill="url(#aVignetteX)"/>
+</svg>

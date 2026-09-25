@@ -1,48 +1,63 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2560 1440" width="2560" height="1440" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Midnight fantasy valley with a distant citadel">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2560 1440" width="2560" height="1440" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Midnight fantasy valley with a lit citadel and cascading waterfalls">
   <defs>
     <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1440" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#030914"/>
-      <stop offset="0.24" stop-color="#051125"/>
-      <stop offset="0.44" stop-color="#0A2A4C"/>
-      <stop offset="0.52" stop-color="#0E3660"/>
+      <stop offset="0.22" stop-color="#051125"/>
+      <stop offset="0.42" stop-color="#0A2A4C"/>
+      <stop offset="0.51" stop-color="#103A66"/>
       <stop offset="0.6" stop-color="#071B33"/>
       <stop offset="1" stop-color="#030A15"/>
     </linearGradient>
-    <radialGradient id="horizonGlow" cx="1180" cy="760" r="900" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#4EA8FF" stop-opacity="0.30"/>
+    <radialGradient id="horizonGlow" cx="1760" cy="780" r="1000" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#4EA8FF" stop-opacity="0.32"/>
       <stop offset="0.5" stop-color="#2A6BB8" stop-opacity="0.12"/>
       <stop offset="1" stop-color="#030914" stop-opacity="0"/>
     </radialGradient>
-    <radialGradient id="moonGlow" cx="1180" cy="300" r="360" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#DCEBFF" stop-opacity="0.55"/>
-      <stop offset="0.35" stop-color="#8FC4FF" stop-opacity="0.18"/>
+    <radialGradient id="moonGlow" cx="1890" cy="290" r="430" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#DCEBFF" stop-opacity="0.6"/>
+      <stop offset="0.32" stop-color="#8FC4FF" stop-opacity="0.2"/>
       <stop offset="1" stop-color="#030914" stop-opacity="0"/>
     </radialGradient>
-    <radialGradient id="moonBody" cx="1120" cy="250" r="220" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#F2F8FF"/>
-      <stop offset="0.7" stop-color="#CFE2FA"/>
-      <stop offset="1" stop-color="#9FBEE4"/>
+    <radialGradient id="moonBody" cx="1852" cy="252" r="240" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F4F9FF"/>
+      <stop offset="0.68" stop-color="#D2E4FB"/>
+      <stop offset="1" stop-color="#A2C1E6"/>
     </radialGradient>
     <linearGradient id="mist" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#9FC8F2" stop-opacity="0"/>
-      <stop offset="0.5" stop-color="#9FC8F2" stop-opacity="0.16"/>
+      <stop offset="0.5" stop-color="#9FC8F2" stop-opacity="0.17"/>
       <stop offset="1" stop-color="#9FC8F2" stop-opacity="0"/>
     </linearGradient>
-    <linearGradient id="water" x1="0" y1="860" x2="0" y2="1440" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#0B2440"/>
-      <stop offset="0.35" stop-color="#07182C"/>
+    <linearGradient id="water" x1="0" y1="1000" x2="0" y2="1440" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0C2A4A"/>
+      <stop offset="0.3" stop-color="#07182C"/>
       <stop offset="1" stop-color="#030A14"/>
     </linearGradient>
+    <linearGradient id="fall" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#BEE2FF" stop-opacity="0.42"/>
+      <stop offset="0.55" stop-color="#9FD4FF" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#9FD4FF" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="towerFace" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#12314F"/>
+      <stop offset="0.42" stop-color="#0A1F38"/>
+      <stop offset="1" stop-color="#07172B"/>
+    </linearGradient>
+    <linearGradient id="leftShade" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#02080F" stop-opacity="0.62"/>
+      <stop offset="0.55" stop-color="#02080F" stop-opacity="0.3"/>
+      <stop offset="1" stop-color="#02080F" stop-opacity="0"/>
+    </linearGradient>
     <linearGradient id="vignetteY" x1="0" y1="0" x2="0" y2="1440" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#02080F" stop-opacity="0.55"/>
-      <stop offset="0.35" stop-color="#02080F" stop-opacity="0"/>
-      <stop offset="1" stop-color="#02070D" stop-opacity="0.86"/>
+      <stop offset="0" stop-color="#02080F" stop-opacity="0.6"/>
+      <stop offset="0.34" stop-color="#02080F" stop-opacity="0"/>
+      <stop offset="1" stop-color="#02070D" stop-opacity="0.88"/>
     </linearGradient>
     <linearGradient id="vignetteX" x1="0" y1="0" x2="2560" y2="0" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#02080F" stop-opacity="0.42"/>
-      <stop offset="0.28" stop-color="#02080F" stop-opacity="0"/>
-      <stop offset="0.82" stop-color="#02080F" stop-opacity="0"/>
-      <stop offset="1" stop-color="#02080F" stop-opacity="0.30"/>
+      <stop offset="0" stop-color="#02080F" stop-opacity="0.44"/>
+      <stop offset="0.26" stop-color="#02080F" stop-opacity="0"/>
+      <stop offset="0.84" stop-color="#02080F" stop-opacity="0"/>
+      <stop offset="1" stop-color="#02080F" stop-opacity="0.34"/>
     </linearGradient>
     <filter id="blurSoft" x="-20%" y="-60%" width="140%" height="220%">
       <feGaussianBlur stdDeviation="26"/>
@@ -55,98 +70,188 @@
   <rect width="2560" height="1440" fill="url(#sky)"/>
   <rect width="2560" height="1440" fill="url(#horizonGlow)"/>
 
+  <!-- starfield: three depth tiers -->
   <g fill="#EAF3FF">
-    <g opacity="0.85">
-      <circle cx="180" cy="120" r="1.6"/><circle cx="320" cy="240" r="1.2"/><circle cx="470" cy="96" r="1.4"/>
-      <circle cx="610" cy="300" r="1.1"/><circle cx="760" cy="150" r="1.7"/><circle cx="905" cy="70" r="1.2"/>
-      <circle cx="1040" cy="210" r="1.3"/><circle cx="1300" cy="120" r="1.5"/><circle cx="1450" cy="260" r="1.1"/>
-      <circle cx="1600" cy="86" r="1.6"/><circle cx="1760" cy="220" r="1.2"/><circle cx="1920" cy="130" r="1.4"/>
-      <circle cx="2080" cy="280" r="1.1"/><circle cx="2230" cy="110" r="1.6"/><circle cx="2400" cy="200" r="1.3"/>
-      <circle cx="2520" cy="330" r="1.1"/>
+    <g opacity="0.88">
+      <circle cx="150" cy="132" r="1.7"/><circle cx="300" cy="250" r="1.3"/><circle cx="452" cy="96" r="1.5"/>
+      <circle cx="600" cy="304" r="1.2"/><circle cx="742" cy="150" r="1.8"/><circle cx="890" cy="72" r="1.3"/>
+      <circle cx="1024" cy="214" r="1.4"/><circle cx="1160" cy="110" r="1.6"/><circle cx="1300" cy="262" r="1.2"/>
+      <circle cx="1436" cy="140" r="1.7"/><circle cx="1570" cy="60" r="1.4"/><circle cx="2110" cy="150" r="1.6"/>
+      <circle cx="2260" cy="230" r="1.3"/><circle cx="2400" cy="104" r="1.7"/><circle cx="2510" cy="300" r="1.2"/>
+      <circle cx="1960" cy="88" r="1.5"/><circle cx="1740" cy="52" r="1.3"/><circle cx="660" cy="430" r="1.2"/>
     </g>
-    <g opacity="0.5">
-      <circle cx="250" cy="380" r="1.1"/><circle cx="395" cy="180" r="1"/><circle cx="540" cy="420" r="1.2"/>
-      <circle cx="690" cy="360" r="1"/><circle cx="840" cy="440" r="1.1"/><circle cx="990" cy="330" r="1"/>
-      <circle cx="1180" cy="60" r="1.2"/><circle cx="1240" cy="470" r="1"/><circle cx="1390" cy="410" r="1.1"/>
-      <circle cx="1520" cy="360" r="1"/><circle cx="1680" cy="440" r="1.2"/><circle cx="1850" cy="380" r="1"/>
-      <circle cx="2000" cy="470" r="1.1"/><circle cx="2160" cy="420" r="1"/><circle cx="2320" cy="500" r="1.1"/>
-      <circle cx="2470" cy="440" r="1"/>
+    <g opacity="0.52">
+      <circle cx="230" cy="392" r="1.2"/><circle cx="378" cy="186" r="1.1"/><circle cx="528" cy="420" r="1.3"/>
+      <circle cx="684" cy="352" r="1.1"/><circle cx="830" cy="446" r="1.2"/><circle cx="978" cy="338" r="1.1"/>
+      <circle cx="1128" cy="62" r="1.3"/><circle cx="1236" cy="470" r="1.1"/><circle cx="1382" cy="408" r="1.2"/>
+      <circle cx="1516" cy="352" r="1.1"/><circle cx="1666" cy="440" r="1.3"/><circle cx="2200" cy="392" r="1.1"/>
+      <circle cx="2330" cy="470" r="1.2"/><circle cx="2456" cy="420" r="1.1"/><circle cx="1876" cy="176" r="1.2"/>
+      <circle cx="2540" cy="540" r="1.1"/>
     </g>
-    <g opacity="0.32">
-      <circle cx="420" cy="620" r="1"/><circle cx="700" cy="580" r="0.9"/><circle cx="960" cy="640" r="1"/>
-      <circle cx="1330" cy="600" r="0.9"/><circle cx="1580" cy="560" r="1"/><circle cx="2200" cy="620" r="0.9"/>
-      <circle cx="2450" cy="580" r="1"/>
+    <g opacity="0.3">
+      <circle cx="410" cy="620" r="1"/><circle cx="690" cy="578" r="0.9"/><circle cx="952" cy="642" r="1"/>
+      <circle cx="1322" cy="598" r="0.9"/><circle cx="1572" cy="556" r="1"/><circle cx="2180" cy="616" r="0.9"/>
+      <circle cx="2436" cy="580" r="1"/><circle cx="1080" cy="520" r="0.9"/>
     </g>
   </g>
 
-  <circle cx="1180" cy="300" r="360" fill="url(#moonGlow)"/>
-  <circle cx="1180" cy="300" r="128" fill="url(#moonBody)"/>
-  <g fill="#B9D3EF" opacity="0.35">
-    <circle cx="1140" cy="266" r="22"/><circle cx="1226" cy="336" r="15"/><circle cx="1164" cy="352" r="10"/>
+  <!-- moon: backlight for the citadel -->
+  <circle cx="1890" cy="290" r="430" fill="url(#moonGlow)"/>
+  <circle cx="1890" cy="290" r="138" fill="url(#moonBody)"/>
+  <g fill="#B9D3EF" opacity="0.32">
+    <circle cx="1846" cy="252" r="24"/><circle cx="1938" cy="322" r="16"/>
+    <circle cx="1872" cy="344" r="11"/><circle cx="1956" cy="236" r="9"/>
   </g>
 
-  <!-- distant ranges -->
-  <path d="M0 700 L180 620 L340 668 L520 566 L700 646 L860 590 L1020 660 L1180 596 L1340 656 L1520 588 L1700 650 L1880 596 L2060 660 L2240 604 L2420 656 L2560 612 L2560 820 L0 820 Z"
-        fill="#123150" opacity="0.85"/>
-  <path d="M0 760 L200 700 L400 752 L600 686 L800 748 L1000 692 L1200 752 L1400 690 L1600 750 L1800 694 L2000 756 L2200 700 L2400 754 L2560 712 L2560 900 L0 900 Z"
-        fill="#0C2440" opacity="0.92"/>
-
-  <!-- citadel on the right -->
-  <g>
-    <path d="M1660 820 L1720 760 L1800 796 L1860 716 L1930 772 L1990 700 L2060 764 L2130 690 L2200 758 L2270 712 L2340 780 L2420 736 L2480 800 L2560 762 L2560 900 L1660 900 Z"
-          fill="#081A2E"/>
-    <path d="M1710 774 L1732 646 L1754 774 Z" fill="#0A1F38"/>
-    <rect x="1726" y="612" width="12" height="40" fill="#0A1F38"/>
-    <path d="M1870 736 L1892 596 L1914 736 Z" fill="#0A1F38"/>
-    <path d="M1908 700 L1936 566 L1964 700 Z" fill="#0D2743"/>
-    <path d="M2000 716 L2024 560 L2048 716 Z" fill="#0A1F38"/>
-    <rect x="2014" y="520" width="16" height="46" fill="#0A1F38"/>
-    <path d="M2140 712 L2166 578 L2192 712 Z" fill="#0D2743"/>
-    <path d="M2300 748 L2320 636 L2340 748 Z" fill="#0A1F38"/>
-    <path d="M2410 760 L2436 654 L2462 760 Z" fill="#0D2743"/>
-    <!-- warm window lights -->
-    <g fill="#E1BC72" opacity="0.75">
-      <rect x="1730" y="712" width="6" height="10"/><rect x="1744" y="724" width="6" height="10"/>
-      <rect x="1896" y="666" width="6" height="10"/><rect x="1912" y="690" width="6" height="10"/>
-      <rect x="1926" y="636" width="6" height="10"/><rect x="1948" y="650" width="6" height="10"/>
-      <rect x="2010" y="642" width="6" height="10"/><rect x="2028" y="668" width="6" height="10"/>
-      <rect x="2156" y="652" width="6" height="10"/><rect x="2172" y="674" width="6" height="10"/>
-      <rect x="2312" y="690" width="6" height="10"/><rect x="2432" y="704" width="6" height="10"/>
-    </g>
-    <!-- waterfall light -->
-    <rect x="2050" y="820" width="10" height="70" fill="#9FD4FF" opacity="0.22" filter="url(#blurTiny)"/>
-  </g>
-
-  <!-- near ridges -->
-  <path d="M0 860 L220 800 L420 852 L640 792 L880 856 L1100 800 L1320 858 L1560 806 L1780 862 L2000 812 L2240 868 L2460 820 L2560 852 L2560 980 L0 980 Z"
+  <!-- four ridge layers with aerial perspective -->
+  <path d="M0 700 L140 636 L300 686 L470 600 L640 672 L810 616 L980 690 L1150 628 L1330 700 L1520 640 L1700 706 L1880 648 L2060 712 L2250 660 L2430 716 L2560 678 L2560 870 L0 870 Z"
+        fill="#123150" opacity="0.82"/>
+  <path d="M0 700 L140 636 L300 686 L470 600 L640 672 L810 616 L980 690 L1150 628 L1330 700 L1520 640 L1700 706 L1880 648 L2060 712 L2250 660 L2430 716 L2560 678"
+        fill="none" stroke="#8DC2F0" stroke-opacity="0.16" stroke-width="2"/>
+  <path d="M0 772 L210 706 L420 762 L630 700 L840 768 L1050 710 L1260 774 L1470 714 L1680 778 L1890 720 L2100 782 L2310 726 L2520 786 L2560 758 L2560 930 L0 930 Z"
+        fill="#0C2440" opacity="0.9"/>
+  <path d="M0 772 L210 706 L420 762 L630 700 L840 768 L1050 710 L1260 774 L1470 714 L1680 778 L1890 720 L2100 782 L2310 726 L2520 786 L2560 758"
+        fill="none" stroke="#7FB6E8" stroke-opacity="0.13" stroke-width="2"/>
+  <path d="M0 848 L240 786 L480 852 L720 792 L960 856 L1200 798 L1440 862 L1680 802 L1920 866 L2160 808 L2400 872 L2560 836 L2560 970 L0 970 Z"
+        fill="#081A2E" opacity="0.94"/>
+  <path d="M0 906 L260 856 L520 912 L780 862 L1040 918 L1300 868 L1560 922 L1820 872 L2080 926 L2340 878 L2560 930 L2560 1010 L0 1010 Z"
         fill="#071829"/>
 
-  <!-- mist bands -->
+  <!-- citadel: curtain wall with crenellations -->
+  <path d="M1430 1000 L1480 902 L1560 878 L2560 846 L2560 1010 Z" fill="#081A2E"/>
+  <path d="M1500 900 h24 v-26 h28 v26 h24 v-26 h28 v26 h24 v-26 h28 v26 h24 v-26 h28 v26 h24 v-26 h28 v26 h24 v-26 h28 v26 h24 v-26 h28 v26 h24 v-26 h28 v26 h24 v-26 h28 v26 h24 v-26 h28 v26 h20 V900 H1500 Z"
+        fill="#0A1F38"/>
+
+  <!-- citadel: nine towers, tallest silhouetted against the moon -->
+  <g>
+    <!-- tower 1 -->
+    <path d="M1504 872 L1512 510 L1588 510 L1596 872 Z" fill="url(#towerFace)"/>
+    <path d="M1508 510 h72 v-24 h-72 Z" fill="#0D2743"/>
+    <path d="M1516 486 L1550 366 L1584 486 Z" fill="#0A1F38"/>
+    <rect x="1547" y="348" width="6" height="20" fill="#0D2743"/>
+    <path d="M1504 510 L1550 366" fill="none" stroke="#9FD4FF" stroke-opacity="0.22" stroke-width="1.6"/>
+    <!-- tower 2 -->
+    <path d="M1610 872 L1620 400 L1700 400 L1710 872 Z" fill="url(#towerFace)"/>
+    <path d="M1614 400 h92 v-26 h-92 Z" fill="#0D2743"/>
+    <path d="M1626 374 L1660 204 L1694 374 Z" fill="#0A1F38"/>
+    <rect x="1657" y="186" width="6" height="20" fill="#0D2743"/>
+    <path d="M1610 400 L1660 204" fill="none" stroke="#9FD4FF" stroke-opacity="0.24" stroke-width="1.8"/>
+    <!-- tower 3 -->
+    <path d="M1724 872 L1732 540 L1808 540 L1816 872 Z" fill="url(#towerFace)"/>
+    <path d="M1728 540 h72 v-24 h-72 Z" fill="#0D2743"/>
+    <path d="M1736 516 L1770 406 L1804 516 Z" fill="#0A1F38"/>
+    <path d="M1724 540 L1770 406" fill="none" stroke="#9FD4FF" stroke-opacity="0.2" stroke-width="1.6"/>
+    <!-- tower 4: the keep -->
+    <path d="M1824 872 L1834 320 L1936 320 L1946 872 Z" fill="url(#towerFace)"/>
+    <path d="M1828 320 h108 v-28 h-108 Z" fill="#0D2743"/>
+    <path d="M1842 292 L1885 104 L1928 292 Z" fill="#0A1F38"/>
+    <rect x="1882" y="86" width="7" height="22" fill="#0D2743"/>
+    <circle cx="1885" cy="80" r="7" fill="#9FD4FF" opacity="0.4"/>
+    <path d="M1824 320 L1885 104" fill="none" stroke="#9FD4FF" stroke-opacity="0.3" stroke-width="2"/>
+    <path d="M1946 320 L1928 292" fill="none" stroke="#9FD4FF" stroke-opacity="0.16" stroke-width="1.6"/>
+    <!-- tower 5 -->
+    <path d="M1954 872 L1964 470 L2046 470 L2056 872 Z" fill="url(#towerFace)"/>
+    <path d="M1958 470 h92 v-26 h-92 Z" fill="#0D2743"/>
+    <path d="M1970 444 L2005 304 L2040 444 Z" fill="#0A1F38"/>
+    <path d="M1954 470 L2005 304" fill="none" stroke="#9FD4FF" stroke-opacity="0.2" stroke-width="1.8"/>
+    <!-- tower 6 -->
+    <path d="M2064 872 L2072 580 L2136 580 L2144 872 Z" fill="url(#towerFace)"/>
+    <path d="M2068 580 h72 v-24 h-72 Z" fill="#0D2743"/>
+    <path d="M2078 556 L2104 462 L2130 556 Z" fill="#0A1F38"/>
+    <!-- tower 7 -->
+    <path d="M2172 872 L2180 520 L2240 520 L2248 872 Z" fill="url(#towerFace)"/>
+    <path d="M2176 520 h68 v-24 h-68 Z" fill="#0D2743"/>
+    <path d="M2186 496 L2210 384 L2234 496 Z" fill="#0A1F38"/>
+    <path d="M2172 520 L2210 384" fill="none" stroke="#9FD4FF" stroke-opacity="0.16" stroke-width="1.6"/>
+    <!-- tower 8 -->
+    <path d="M2280 872 L2288 620 L2344 620 L2352 872 Z" fill="url(#towerFace)"/>
+    <path d="M2284 620 h64 v-22 h-64 Z" fill="#0D2743"/>
+    <path d="M2294 598 L2316 518 L2338 598 Z" fill="#0A1F38"/>
+    <!-- tower 9 -->
+    <path d="M2382 872 L2390 660 L2442 660 L2450 872 Z" fill="url(#towerFace)"/>
+    <path d="M2386 660 h60 v-22 h-60 Z" fill="#0D2743"/>
+    <path d="M2396 638 L2416 574 L2436 638 Z" fill="#0A1F38"/>
+  </g>
+
+  <!-- citadel: warm window lights, three tiers -->
+  <g fill="#E1BC72" opacity="0.78">
+    <rect x="1522" y="556" width="6" height="11"/><rect x="1552" y="556" width="6" height="11"/>
+    <rect x="1522" y="606" width="6" height="11"/><rect x="1574" y="606" width="6" height="11"/>
+    <rect x="1522" y="656" width="6" height="11"/><rect x="1552" y="656" width="6" height="11"/><rect x="1574" y="656" width="6" height="11"/>
+    <rect x="1632" y="452" width="6" height="11"/><rect x="1664" y="452" width="6" height="11"/><rect x="1692" y="452" width="6" height="11"/>
+    <rect x="1632" y="506" width="6" height="11"/><rect x="1692" y="506" width="6" height="11"/>
+    <rect x="1632" y="560" width="6" height="11"/><rect x="1664" y="560" width="6" height="11"/>
+    <rect x="1744" y="586" width="6" height="11"/><rect x="1776" y="586" width="6" height="11"/>
+    <rect x="1744" y="640" width="6" height="11"/><rect x="1776" y="640" width="6" height="11"/>
+    <rect x="1852" y="368" width="7" height="12"/><rect x="1900" y="368" width="7" height="12"/>
+    <rect x="1852" y="430" width="7" height="12"/><rect x="1876" y="430" width="7" height="12"/><rect x="1900" y="430" width="7" height="12"/>
+    <rect x="1852" y="496" width="7" height="12"/><rect x="1900" y="496" width="7" height="12"/>
+    <rect x="1852" y="562" width="7" height="12"/><rect x="1876" y="562" width="7" height="12"/>
+    <rect x="1980" y="518" width="6" height="11"/><rect x="2012" y="518" width="6" height="11"/>
+    <rect x="1980" y="572" width="6" height="11"/><rect x="2012" y="572" width="6" height="11"/>
+    <rect x="1980" y="700" width="6" height="11"/><rect x="2012" y="700" width="6" height="11"/>
+    <rect x="2086" y="628" width="6" height="11"/><rect x="2116" y="628" width="6" height="11"/>
+    <rect x="2086" y="682" width="6" height="11"/><rect x="2116" y="682" width="6" height="11"/>
+    <rect x="2192" y="566" width="6" height="11"/><rect x="2222" y="566" width="6" height="11"/>
+    <rect x="2192" y="622" width="6" height="11"/><rect x="2222" y="622" width="6" height="11"/>
+    <rect x="2298" y="664" width="6" height="11"/><rect x="2324" y="664" width="6" height="11"/>
+    <rect x="2398" y="700" width="6" height="11"/><rect x="2420" y="700" width="6" height="11"/>
+  </g>
+  <g fill="#E1BC72" opacity="0.3">
+    <rect x="1522" y="556" width="6" height="11"/><rect x="1692" y="452" width="6" height="11"/>
+    <rect x="1900" y="430" width="7" height="12"/><rect x="2012" y="572" width="6" height="11"/>
+    <rect x="2222" y="622" width="6" height="11"/>
+  </g>
+
+  <!-- citadel: cascading waterfalls -->
+  <g opacity="0.6" filter="url(#blurTiny)" fill="url(#fall)">
+    <rect x="1660" y="906" width="86" height="150"/>
+    <rect x="1930" y="906" width="104" height="132"/>
+    <rect x="2100" y="906" width="58" height="104"/>
+  </g>
+  <g fill="url(#fall)">
+    <rect x="1692" y="902" width="18" height="164"/>
+    <rect x="1972" y="902" width="22" height="146"/>
+    <rect x="2120" y="902" width="14" height="112"/>
+  </g>
+  <g stroke="#DCF0FF" stroke-opacity="0.34" stroke-width="2" stroke-linecap="round">
+    <path d="M1701 908 V1058"/><path d="M1983 908 V1042"/><path d="M2127 908 V1010"/>
+  </g>
+
+  <!-- mist: warm bands crossing the citadel base plus a low drift -->
   <g filter="url(#blurSoft)">
-    <ellipse cx="900" cy="880" rx="720" ry="50" fill="url(#mist)"/>
-    <ellipse cx="1900" cy="830" rx="620" ry="44" fill="url(#mist)"/>
-    <ellipse cx="1400" cy="940" rx="900" ry="40" fill="url(#mist)"/>
-    <ellipse cx="400" cy="960" rx="520" ry="38" fill="url(#mist)"/>
+    <ellipse cx="840" cy="884" rx="760" ry="52" fill="url(#mist)"/>
+    <ellipse cx="1880" cy="852" rx="680" ry="46" fill="url(#mist)"/>
+    <ellipse cx="2280" cy="918" rx="560" ry="42" fill="url(#mist)"/>
+    <ellipse cx="1320" cy="946" rx="920" ry="42" fill="url(#mist)"/>
+    <ellipse cx="380" cy="972" rx="560" ry="40" fill="url(#mist)"/>
+    <ellipse cx="1700" cy="1030" rx="1020" ry="38" fill="url(#mist)"/>
   </g>
 
-  <!-- lake -->
-  <rect x="0" y="940" width="2560" height="500" fill="url(#water)"/>
-  <g opacity="0.22" filter="url(#blurTiny)" fill="#9FD4FF">
-    <rect x="1148" y="960" width="64" height="330"/>
-    <rect x="1892" y="980" width="86" height="230"/>
-    <rect x="2030" y="990" width="40" height="190"/>
-    <rect x="2300" y="1000" width="52" height="140"/>
+  <!-- lake: moon path, citadel reflection, ripples -->
+  <rect x="0" y="1000" width="2560" height="440" fill="url(#water)"/>
+  <g opacity="0.26" filter="url(#blurTiny)" fill="#9FD4FF">
+    <rect x="1856" y="1010" width="76" height="310"/>
+    <rect x="1690" y="1030" width="54" height="230"/>
+    <rect x="1972" y="1040" width="62" height="200"/>
+    <rect x="2114" y="1050" width="40" height="150"/>
   </g>
-  <g stroke="#8FC8FF" stroke-opacity="0.14" stroke-width="3" stroke-linecap="round">
-    <path d="M980 1010 H1560"/><path d="M1080 1060 H1660"/><path d="M900 1116 H1500"/>
-    <path d="M1180 1180 H1820"/><path d="M860 1246 H1420"/><path d="M1240 1310 H1900"/>
-    <path d="M940 1372 H1520"/>
+  <g opacity="0.14" filter="url(#blurTiny)" fill="#E1BC72">
+    <rect x="1690" y="1012" width="120" height="42"/>
+    <rect x="1970" y="1012" width="90" height="34"/>
+  </g>
+  <g stroke="#8FC8FF" stroke-opacity="0.13" stroke-width="3" stroke-linecap="round">
+    <path d="M980 1042 H1560"/><path d="M1080 1092 H1660"/><path d="M900 1148 H1500"/>
+    <path d="M1180 1212 H1820"/><path d="M860 1278 H1420"/><path d="M1240 1342 H1900"/>
+    <path d="M940 1404 H1520"/>
   </g>
 
-  <!-- foreground rock shelf -->
+  <!-- foreground rock shelves: keep the lower corners dark and low-detail -->
   <path d="M0 1180 L260 1120 L560 1200 L840 1140 L1080 1230 L1180 1440 L0 1440 Z" fill="#050F1C" opacity="0.92"/>
-  <path d="M2560 1160 L2320 1112 L2100 1190 L1900 1146 L1740 1250 L1700 1440 L2560 1440 Z" fill="#050F1C" opacity="0.8"/>
+  <path d="M2560 1160 L2320 1112 L2100 1190 L1900 1146 L1740 1250 L1700 1440 L2560 1440 Z" fill="#050F1C" opacity="0.82"/>
 
+  <!-- shading: negative space for the interface, then vignettes -->
+  <rect width="1250" height="1440" fill="url(#leftShade)"/>
   <rect width="2560" height="1440" fill="url(#vignetteY)"/>
   <rect width="2560" height="1440" fill="url(#vignetteX)"/>
 </svg>
