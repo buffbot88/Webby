@@ -61,28 +61,43 @@
     `;
   }
 
+  // Renders that come back as markup with no text (an empty result list, a
+  // widget that resolves to nothing) would leave a section showing its header
+  // and an empty body, which reads as a broken card.
+  function hasVisibleContent(html) {
+    return String(html || "")
+      .replace(/<[^>]*>/g, " ")
+      .replace(/&nbsp;/gi, " ")
+      .trim().length > 0;
+  }
+
   function renderSectionBlock(title, subtitle, bodyHtml, sectionId = "", options = {}) {
+    const body = hasVisibleContent(bodyHtml)
+      ? bodyHtml
+      : renderPortalEmpty("Nothing here yet", "This section has no published content to show right now.");
     return `
       <section class="home-section-block cms-card module-card" ${sectionId ? `data-home-section="${escape(sectionId)}"` : ""}>
         ${sectionHeader(title, subtitle, options.route, options.routeLabel)}
-        <div class="home-section-body">${bodyHtml}</div>
+        <div class="home-section-body">${body}</div>
       </section>
     `;
   }
 
-  function renderPortalEmpty(title, body, route, actionLabel) {
+  // The section header already carries the "All Articles" / "Full calendar"
+  // action, so repeating the destination here only produced a full-width
+  // button sitting inside a dashed box. The placeholder stays text-only.
+  function renderPortalEmpty(title, body) {
     return `
       <div class="portal-empty-state glass-subtle">
         <strong>${escape(title)}</strong>
         <p>${escape(body)}</p>
-        ${route ? `<button type="button" class="button-secondary" onclick="Runtime.navigate('${escape(route)}')">${escape(actionLabel || "Open")}</button>` : ""}
       </div>
     `;
   }
 
   function renderFeedList(items, emptyTitle, emptyMessage, badgeLabel, linkPrefix) {
     if (!state.loaded) return `<div class="portal-empty-state is-loading glass-subtle"><strong>Loading</strong><p>Collecting the latest public updates.</p></div>`;
-    if (!items.length) return renderPortalEmpty(emptyTitle, emptyMessage, linkPrefix.replace("#", ""), "Open section");
+    if (!items.length) return renderPortalEmpty(emptyTitle, emptyMessage);
     return `
       <ul class="home-feed-list">
         ${items
@@ -196,9 +211,7 @@
     if (!state.events.length) {
       return renderPortalEmpty(
         "No events scheduled",
-        "Published events will appear here with dates, times, and locations.",
-        "calendar",
-        "Open calendar"
+        "Published events will appear here with dates, times, and locations."
       );
     }
     return `
@@ -227,22 +240,22 @@
     if (!state.loaded) return `<div class="portal-empty-state is-loading glass-subtle"><strong>Loading</strong><p>Preparing recent community activity.</p></div>`;
     if (window.ActivityFeedCoreSystem?.renderActivityFeed) {
       if (!state.activities.length) {
-        return renderPortalEmpty("No activity yet", "New posts, replies, events, and social actions will collect here.", "", "");
+        return renderPortalEmpty("No activity yet", "New posts, replies, events, and social actions will collect here.");
       }
       return `<div class="home-activity-panel">${window.ActivityFeedCoreSystem.renderActivityFeed(state.activities)}</div>`;
     }
-    return renderPortalEmpty("Activity unavailable", "The activity feed is not available in this runtime.", "", "");
+    return renderPortalEmpty("Activity unavailable", "The activity feed is not available in this runtime.");
   }
 
   function renderTrendingSummary() {
     if (!state.loaded) return `<div class="portal-empty-state is-loading glass-subtle"><strong>Loading</strong><p>Looking for featured public content.</p></div>`;
     if (window.SearchCoreSystem?.renderResults) {
       if (!state.trending.length) {
-        return renderPortalEmpty("No featured content yet", "Featured and frequently updated items will appear here.", "", "");
+        return renderPortalEmpty("No featured content yet", "Featured and frequently updated items will appear here.");
       }
       return `<div class="home-featured-panel">${window.SearchCoreSystem.renderResults(state.trending)}</div>`;
     }
-    return renderPortalEmpty("Discovery unavailable", "Featured content tools are not available in this runtime.", "", "");
+    return renderPortalEmpty("Discovery unavailable", "Featured content tools are not available in this runtime.");
   }
 
   function renderSpotlight() {

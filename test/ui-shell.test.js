@@ -21,6 +21,19 @@ function exists(rel) {
   return fs.existsSync(path.join(ROOT, rel));
 }
 
+function walkSources(dir, out = []) {
+  for (const entry of fs.readdirSync(path.join(ROOT, dir), { withFileTypes: true })) {
+    const rel = `${dir}/${entry.name}`;
+    if (entry.isDirectory()) walkSources(rel, out);
+    else if (/\.(js|jsx)$/.test(entry.name)) out.push(rel);
+  }
+  return out;
+}
+
+function classAttributes(source) {
+  return [...source.matchAll(/class(?:Name)?\s*=\s*["']([^"']*)["']/g)].map((m) => m[1]);
+}
+
 function slotsIn(source) {
   return [...source.matchAll(/\{\{slot:([a-zA-Z]+)\}\}/g)].map((match) => match[1]);
 }
@@ -169,6 +182,53 @@ test("the theme is one stylesheet, with the glass parity rules folded in", () =>
       `${entry} must not link the retired parity sheet`
     );
   }
+});
+
+test("content pages do not re-use the chrome's own classes", () => {
+  // These are styled for the shell context: the icon rail, the sticky topbar,
+  // the mobile bottom bar, the fixed background layer and the palette dropdown.
+  // A content page that re-uses one inherits positioning it was never meant to
+  // have, which is how the palette's .search-results collapsed the featured card.
+  const chromeOwned = [
+    "app-shell",
+    "app-background",
+    "app-background-art",
+    "nav-rail",
+    "rail-logo",
+    "topbar",
+    "bottom-nav",
+    "search-kbd",
+    "search-results",
+    "action-dot"
+  ];
+
+  const offenders = [];
+  for (const file of walkSources("Core")) {
+    for (const value of classAttributes(read(file))) {
+      const tokens = value.split(/[\s$?{}:]+/);
+      for (const owned of chromeOwned) {
+        if (tokens.includes(owned)) offenders.push(`${file} uses .${owned}`);
+      }
+    }
+  }
+
+  assert.deepEqual(offenders, [], "content markup must not hand-write chrome classes");
+});
+
+test("palette-positioned search markup is neutralised inside content cards", () => {
+  const css = read("assets/theme.css");
+
+  // .search-results is absolutely positioned for the topbar dropdown. Reused
+  // inside a section card it takes the list out of flow and the card collapses
+  // to its header, so the content container has to reset it.
+  assert.ok(
+    /\.home-featured-panel \.search-results\s*\{[^}]*position:\s*static/.test(css),
+    ".search-results must fall back to in-flow layout inside a home section card"
+  );
+  assert.ok(
+    /\.home-featured-panel \.search-result\s*\{[^}]*border:\s*1px solid/.test(css),
+    "featured rows must keep the glass row treatment of the other home feeds"
+  );
 });
 
 test("both entrypoints load the theme, fonts and brand mark", () => {

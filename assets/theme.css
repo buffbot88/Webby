@@ -1382,6 +1382,87 @@ button.primary {
   gap: 16px;
 }
 
+/* =========================================================
+   HOME PORTAL — FEATURED PANEL, EMPTY STATES, ASIDE
+========================================================= */
+
+/* Featured & trending renders through SearchCoreSystem.renderResults, whose
+   .search-results container is positioned for the topbar palette dropdown
+   (absolute, 100% + 10px). Reused inside a section card that lifts the list
+   out of flow, which collapsed the card to its header and parked the list
+   behind the rest of the page. Restore in-flow layout and give the rows the
+   same glass treatment as the other home feeds. */
+.home-featured-panel .search-results {
+  position: static;
+  gap: 8px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow: none;
+}
+
+.home-featured-panel .search-result {
+  display: grid;
+  gap: 4px;
+  border: 1px solid var(--border-glass);
+  border-radius: 14px;
+  background: var(--glass-1);
+  color: var(--text);
+  padding: 10px 12px;
+  text-decoration: none;
+}
+
+.home-featured-panel .search-result:hover {
+  border-color: var(--border-bright);
+}
+
+.home-featured-panel .search-result strong {
+  color: var(--text);
+  font-weight: 900;
+}
+
+.home-featured-panel .search-result span {
+  color: var(--muted);
+  font-size: 12.5px;
+}
+
+/* A placeholder already sits inside a framed section card, so a second
+   dashed frame around it read as a box in a box. Keep it quiet: a
+   left-ruled note aligned with the section header. */
+:root .home-section-body .portal-empty-state {
+  justify-items: start;
+  gap: 4px;
+  border: 0;
+  border-left: 2px solid var(--border-glass);
+  border-radius: 0;
+  background: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow: none;
+  padding: 2px 0 2px 12px;
+}
+
+:root .home-section-body .portal-empty-state strong {
+  font-size: 14px;
+}
+
+:root .home-section-body .portal-empty-state p {
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* Hold the featured/activity column in view while the feed column scrolls,
+   instead of leaving a dead half-page beneath it. */
+@media (min-width: 1024px) {
+  .home-portal-aside {
+    position: sticky;
+    top: calc(var(--header-height) + 12px);
+  }
+}
+
 .home-portal-quicknav,
 .home-portal-widgets {
   display: grid;
@@ -3020,6 +3101,21 @@ button.primary {
   :root[data-background-mode="auth"] .app-background-art {
     background-image: url("./brand/webby-night-portrait.svg");
   }
+}
+
+/* =========================================================
+   ADMIN CONSOLE FIXUPS
+
+   .admin-button-success writes its border as `border-  color`, an
+   invalid property name, so browsers drop that declaration and the
+   success button never gets the green outline its siblings carry.
+   The broken rule sits past the region this workspace can edit, and
+   nothing after it declares a border-color for the class, so the
+   intended value is restored from here instead.
+========================================================= */
+
+.admin-button-success {
+  border-color: #7de0b4;
 }
 
 /* =========================================================
